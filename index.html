@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite RP - Повний Релізний Код</title>
+    <title>Elite RP - Офіційний Портал</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -13,6 +14,7 @@
             --bg: #0c0a08;
             --card-bg: rgba(22, 19, 15, 0.85);
             --border-color: rgba(243, 168, 46, 0.3);
+            --banner-glow: rgba(243, 168, 46, 0.35);
         }
 
         * {
@@ -21,6 +23,7 @@
             box-sizing: border-box;
             outline: none;
             font-family: 'Montserrat', sans-serif;
+            user-select: none;
         }
 
         body, html {
@@ -31,7 +34,6 @@
             overflow-x: hidden;
         }
 
-        /* ФОНОВІ СЦЕНИ */
         .background-scene {
             position: fixed;
             top: 0;
@@ -92,7 +94,7 @@
             letter-spacing: 1px;
         }
 
-      .lock-desc {
+        .lock-desc {
             font-size: 16px;
             color: #ff9999;
             max-width: 500px;
@@ -255,7 +257,9 @@
             padding: 5px 14px 5px 6px;
             border-radius: 25px;
             cursor: pointer;
+            transition: 0.3s;
         }
+        .user-profile-badge:hover { border-color: var(--gold); background: rgba(255,255,255,0.12); }
 
         .user-avatar-small {
             width: 32px;
@@ -347,8 +351,15 @@
         .online-info { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
         .online-nick { font-size: 13px; font-weight: 800; color: white; }
 
-        /* КНОПКА ВИДАЧІ ПОСАДИ (ТІЛЬКИ ДЛЯ TECH ADMIN) */
-        .btn-give-role-panel {
+        /* ПАНЕЛЬ КЕРУВАННЯ / ТЕХ. ПІДТРИМКА */
+        .admin-action-btns-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn-give-role-panel, .btn-tech-support-panel {
             background: linear-gradient(135deg, #ff7700 0%, #ff3300 100%);
             color: white;
             padding: 12px 20px;
@@ -362,10 +373,9 @@
             display: none;
             align-items: center;
             gap: 8px;
-            margin-top: 10px;
         }
-
-        .btn-give-role-panel:hover { transform: translateY(-2px); }
+        .btn-tech-support-panel { background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); box-shadow: 0 4px 15px rgba(0, 114, 255, 0.4); }
+        .btn-give-role-panel:hover, .btn-tech-support-panel:hover { transform: translateY(-2px); }
 
         .manage-user-card {
             background: rgba(255,255,255,0.03);
@@ -463,7 +473,7 @@
         .btn-result-passed { background: #2ecc71; color: white; padding: 14px 28px; border-radius: 12px; font-weight: 900; font-size: 13px; border: none; cursor: pointer; }
         .btn-result-failed { background: #e74c3c; color: white; padding: 14px 28px; border-radius: 12px; font-weight: 900; font-size: 13px; border: none; cursor: pointer; }
 
-        /* HERO BANNER */
+        /* HERO BANNER ЗІ ЗМІННОЮ ПОДСВІТКОЮ */
         .hero-banner {
             background: linear-gradient(135deg, rgba(25, 21, 16, 0.85) 0%, rgba(12, 10, 8, 0.9) 100%);
             border: 1px solid var(--border-color);
@@ -471,7 +481,8 @@
             padding: 50px 40px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 45px var(--banner-glow);
+            transition: box-shadow 0.3s ease;
         }
 
         .hero-subtitle { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 15px; }
@@ -495,6 +506,27 @@
         .info-card:hover { border-color: rgba(243, 168, 46, 0.5); transform: translateY(-3px); }
         .info-card h3 { font-size: 17px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
         .info-card p { font-size: 13px; color: #9a9a9a; line-height: 1.5; }
+
+        /* ПЛАВАЮЧА КНОПКА ТЕХПІДТРИМКИ (ЧАТ) */
+        .floating-chat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--gold) 0%, #d48312 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0c0a08;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(243, 168, 46, 0.5);
+            z-index: 4000;
+            transition: 0.3s;
+        }
+        .floating-chat-btn:hover { transform: scale(1.1); box-shadow: 0 8px 25px rgba(243, 168, 46, 0.8); }
 
         /* МОДАЛЬНІ ВІКНА */
         .modal-overlay {
@@ -608,6 +640,41 @@
         .hierarchy-item { background: rgba(0,0,0,0.4); border-left: 3px solid var(--gold); border-radius: 8px; padding: 12px 16px; }
         .hierarchy-rank { font-size: 11px; color: var(--gold); font-weight: 800; text-transform: uppercase; }
         .hierarchy-name { font-size: 14px; font-weight: 700; color: white; margin-top: 2px; }
+        .role-factionleader{background:linear-gradient(135deg,#005f69,#13a8b3,#005f69);color:#fff;border:1px solid #bff9ff;font-family:'Cinzel',serif;letter-spacing:1px;text-shadow:0 0 6px #fff;box-shadow:0 0 6px #fff,0 0 16px rgba(19,168,179,.9)}
+.btn-faction-apply{background:linear-gradient(135deg,#13a8b3,#005f69);color:#fff;padding:14px 24px;border-radius:12px;font-weight:800;font-size:13px;text-transform:uppercase;border:none;cursor:pointer}
+.btn-review-panel{background:linear-gradient(135deg,#13a8b3,#005f69);color:#fff;padding:12px 20px;border-radius:12px;font-weight:800;font-size:12px;text-transform:uppercase;border:none;cursor:pointer;display:none;align-items:center;gap:8px;box-shadow:0 4px 15px rgba(19,168,179,.5)}
+.btn-my-requests{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--border-color);padding:12px;border-radius:12px;font-weight:800;font-size:12px;text-transform:uppercase;cursor:pointer;width:100%;margin-top:10px}
+.app-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--gold);border-radius:18px;padding:18px 22px;margin-bottom:18px;background:linear-gradient(135deg,rgba(243,168,46,.12),rgba(0,0,0,.4))}
+.app-sticker{font-size:46px;color:var(--gold-light);filter:drop-shadow(0 0 10px rgba(255,215,0,.6))}
+.app-head-sub{font-size:10px;letter-spacing:3px;color:var(--gold);font-weight:700;text-transform:uppercase}
+.app-head-title{font-family:'Cinzel',serif;font-size:19px;font-weight:900;color:#fff;text-transform:uppercase;line-height:1.3;margin-top:4px}
+.app-field{text-align:left;margin-bottom:14px;background:rgba(255,255,255,.025);border:1px solid rgba(243,168,46,.15);border-radius:12px;padding:12px 14px}
+.app-field label{display:block;font-size:12px;font-weight:700;color:var(--gold-light);margin-bottom:8px}
+.app-field input[type=range]{width:100%;accent-color:var(--gold)}
+.app-field select option{background:#181512}
+.range-val{color:#fff;font-weight:900;font-size:15px;margin-left:6px}
+.rv-tabs{display:flex;gap:10px;margin:15px 0;flex-wrap:wrap;justify-content:center}
+.rv-tab{padding:10px 18px;border-radius:10px;font-weight:800;font-size:12px;text-transform:uppercase;cursor:pointer;background:transparent;border:2px solid;opacity:.55}
+.rv-tab.active{opacity:1;color:#0c0a08!important}
+.rv-tab.pending{border-color:#f1c40f;color:#f1c40f}.rv-tab.pending.active{background:#f1c40f}
+.rv-tab.rejected{border-color:#e74c3c;color:#e74c3c}.rv-tab.rejected.active{background:#e74c3c;color:#fff!important}
+.rv-tab.approved{border-color:#2ecc71;color:#2ecc71}.rv-tab.approved.active{background:#2ecc71}
+.cnt-badge{background:#13a8b3;color:#fff;border-radius:20px;padding:2px 9px;font-size:11px;margin-left:auto}
+.app-card{background:rgba(0,0,0,.45);border:1px solid var(--border-color);border-radius:16px;padding:18px;margin-bottom:16px;text-align:left}
+.app-card-user{display:flex;align-items:center;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.app-qa{font-size:12px;margin-bottom:8px;color:#e0e0e0}.app-qa b{color:var(--gold);display:block;font-size:11px;margin-bottom:2px}
+.app-actions{display:flex;gap:10px;margin-top:14px}
+.app-actions button,.tech-actions button{flex:1;padding:11px;border-radius:10px;border:none;font-weight:800;font-size:12px;text-transform:uppercase;cursor:pointer;color:#fff}
+.b-reject{background:#e74c3c}.b-reply{background:#0072ff}.b-ok{background:#2ecc71;color:#0c0a08!important}.b-neutral{background:rgba(255,255,255,.12)}
+.tech-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.st-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:8px;font-size:10px;font-weight:900;text-transform:uppercase}
+.st-pending{background:rgba(241,196,15,.15);color:#f1c40f;border:1px solid #f1c40f}
+.st-replied{background:rgba(0,114,255,.15);color:#4da3ff;border:1px solid #0072ff}
+.st-approved{background:rgba(46,204,113,.15);color:#2ecc71;border:1px solid #2ecc71}
+.st-rejected{background:rgba(231,76,60,.15);color:#ff6b6b;border:1px solid #e74c3c}
+.my-group-title{font-size:13px;font-weight:900;text-transform:uppercase;margin:16px 0 8px;display:flex;align-items:center;gap:8px}
+.reply-box{background:rgba(0,114,255,.1);border-left:3px solid #0072ff;border-radius:8px;padding:10px 12px;font-size:12px;margin-top:8px}
+.reason-box{background:rgba(231,76,60,.12);border:1px solid #e74c3c;border-radius:12px;padding:14px;margin:15px 0;text-align:left;font-size:13px;color:#ffb3ab}
 
         @media (max-width: 950px) {
             .main-wrapper { grid-template-columns: 1fr; }
@@ -621,10 +688,11 @@
     <div class="background-scene"></div>
     <div class="gradient-mask"></div>
 
-   <div id="interview-lock-screen">
+    <!-- ЕКРАН БЛОКУВАННЯ ПІД ЧАС ОБЗВОНУ -->
+    <div id="interview-lock-screen">
         <div class="lock-icon-box"><i class="fa-solid fa-user-lock"></i></div>
-        <div class="lock-title" id="lock-screen-title">Тимчасовий обмежений доступ</div>
-        <div class="lock-desc" id="lock-screen-desc">Для вас сайт тимчасово недоступний до закінчення обзвону.<br>Будь ласка, зачекайте завершення процедури адміністратором.</div>
+        <div class="lock-title" id="lock-screen-title">Сайт тимчасово заблоковано</div>
+        <div class="lock-desc" id="lock-screen-desc">Сайт тимчасово заблоковано до завершення обзвону з метою збереження конфіденційності.</div>
         <button id="btn-dismiss-lock" class="btn-auth-main" style="display: none; max-width: 320px;" onclick="dismissLockScreen()">Закрити та повернутися до сайту</button>
     </div>
 
@@ -678,9 +746,9 @@
             <a href="#" class="active">Головна</a>
             <a href="#" onclick="openRulesModal(); return false;">Правила</a>
             <a href="#" onclick="openFactionsModal(); return false;">Фракції</a>
-            <a href="#" onclick="openHighAdminModal(); return false;">Верховна Адміністрація</a>
+            <a href="#" onclick="openHighAdminModal(); return false;">Адміністрація</a>
         </nav>
-        <div class="user-profile-badge" onclick="logoutUser()" title="Натисніть, щоб вийти">
+        <div class="user-profile-badge" onclick="openAccountModal()" title="Керування акаунтом">
             <img src="https://i.postimg.cc/hPG3FjBV/50f72c47-ae9d-4cad-a659-19acf923f8d5.png" class="user-avatar-small" id="header-user-ava">
             <span id="header-username" style="font-size: 12px; font-weight: 700;">Гравець</span>
             <div id="header-roles-box" style="display: inline-block;"></div>
@@ -693,20 +761,27 @@
         <div class="content-area">
             
             <!-- ГОЛОВНИЙ БАНЕР -->
-            <section class="hero-banner">
+            <section class="hero-banner" id="mainHeroBanner">
                 <div class="hero-subtitle">Roblox Roleplay</div>
                 <h1 class="hero-title"><span style="color:var(--gold);">Elite</span> RP</h1>
                 <p class="hero-desc">Реалістичне рольове місто: поліція, медики, цивільні та кримінал. Обирай фракцію, дотримуйся правил і створюй свою історію.</p>
                 <div class="hero-buttons">
                     <button class="btn-primary" onclick="openServerModal()">На сервер</button>
                     <button class="btn-secondary" onclick="openFactionsModal()"><i class="fa-solid fa-users-gear"></i> Обрати фракцію</button>
+                    <button class="btn-faction-apply" onclick="openApplyFactionsModal()"><i class="fa-solid fa-file-signature"></i> Подати анкету у фракцію</button>
                     <button class="btn-support-tech" onclick="openSupportModal()"><i class="fa-solid fa-heart"></i> Підтримати тех. адміна</button>
                 </div>
 
-                <!-- КНОПКА ВИДАЧІ ПОСАДИ (ВИДИМА ЛИШЕ ДЛЯ ТЕХ. АДМІНІСТРАТОРА) -->
-                <button class="btn-give-role-panel" id="btn-give-role-main" onclick="openManageRolesModal()">
-                    <i class="fa-solid fa-user-gear"></i> Видача посади
-                </button>
+                <!-- КНОПКИ КЕРУВАННЯ (ДЛЯ ТЕХ. АДМІНІСТРАТОРА ТА ВИЩИХ) -->
+                <div class="admin-action-btns-row">
+                    <button class="btn-give-role-panel" id="btn-give-role-main" onclick="openManageRolesModal()">
+                        <i class="fa-solid fa-user-gear"></i> Видача посади
+                    </button>
+                    <button class="btn-tech-support-panel" id="btn-tech-support-main" onclick="openTechSupportRequestsModal()">
+                        <i class="fa-solid fa-headset"></i> Підтримка (<span id="support-requests-count">0</span>)
+                    </button>
+                    <button class="btn-review-panel" id="btn-review-apps" onclick="openReviewModal()"><i class="fa-solid fa-clipboard-check"></i> Перевірка анкет у фракцію</button>
+                </div>
 
                 <!-- ДИНАМІЧНИЙ БЛОК ОБЗВОНУ -->
                 <div id="interview-control-area" style="display: none; margin-top: 15px;">
@@ -784,6 +859,67 @@
 
     </div>
 
+    <!-- ПЛАВАЮЧА КНОПКА ТЕХПІДТРИМКИ (ЧАТ) -->
+    <div class="floating-chat-btn" onclick="openTechChatModal()" title="Зв'язатися з техпідтримкою">
+        <i class="fa-solid fa-headset"></i>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО КЕРУВАННЯ АКАУНТОМ -->
+    <div id="accountModal" class="modal-overlay" onclick="closeAccountModalOutside(event)">
+        <div class="modal-box" style="max-width: 460px;">
+            <button class="modal-close" onclick="closeAccountModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-user-gear"></i></div>
+            <div class="modal-title">Налаштування акаунта</div>
+            
+            <div class="auth-input-group">
+                <label>Посилання на аватарку (URL)</label>
+                <input type="text" id="acc-avatar-input" class="auth-input" placeholder="https://example.com/avatar.png">
+            </div>
+
+            <div class="auth-input-group">
+                <label>Колір підсвітки головного банера</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="color" id="acc-glow-color" value="#f3a82e" style="width: 50px; height: 42px; background: none; border: 1px solid var(--border-color); border-radius: 10px; cursor: pointer;">
+                    <span style="font-size: 12px; color: #aaa;">Виберіть колір для неонової підсвітки банера</span>
+                </div>
+            </div>
+
+            <button class="btn-auth-main" onclick="saveAccountChanges()">Зберегти зміни</button>
+            <button class="btn-auth-switch" style="border-color: #e74c3c; color: #ff6b6b; margin-top: 15px;" onclick="logoutUser()">Вийти з акаунта</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО АНКЕТИ ТЕХПІДТРИМКИ -->
+    <div id="techChatModal" class="modal-overlay" onclick="closeTechChatModalOutside(event)">
+        <div class="modal-box" style="max-width: 480px;">
+            <button class="modal-close" onclick="closeTechChatModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-headset"></i></div>
+            <div class="modal-title">Технічна підтримка</div>
+            <p class="modal-text" style="text-align: center;">Заповніть анкету, і наша техпідтримка зв'яжеться з вами в Discord:</p>
+            
+            <div class="auth-input-group">
+                <label>Ваш Discord (наприклад: username#0000)</label>
+                <input type="text" id="tech-discord-input" class="auth-input" placeholder="Введіть ваш Discord тег">
+            </div>
+            <div class="auth-input-group">
+                <label>Опишіть вашу проблему</label>
+                <textarea id="tech-problem-input" class="auth-input" rows="4" placeholder="Що трапилося? Детально опишіть проблему..." style="resize: none;"></textarea>
+            </div>
+            <button class="btn-my-requests" onclick="openMyRequests()"><i class="fa-solid fa-inbox"></i> Мої звернення</button>
+            <button class="btn-auth-main" onclick="submitTechSupportRequest()">Надіслати звернення</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ПЕРЕГЛЯДУ ЗВЕРНЕНЬ (ДЛЯ ТЕХ. АДМІНІСТРАТОРА) -->
+    <div id="techRequestsModal" class="modal-overlay" onclick="closeTechRequestsModalOutside(event)">
+        <div class="modal-box" style="max-width: 750px;">
+            <button class="modal-close" onclick="closeTechRequestsModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-clipboard-list"></i></div>
+            <div class="modal-title">Звернення до техпідтримки</div>
+            <div class="rules-content-box" id="tech-requests-list-container" style="max-height: 400px; text-align: left;"></div>
+        </div>
+    </div>
+
     <!-- МОДАЛЬНЕ ВІКНО КЕРУВАННЯ РОЛЯМИ (ВИДАЧА ПОСАДИ) -->
     <div id="manageRolesModal" class="modal-overlay" onclick="closeManageRolesModalOutside(event)">
         <div class="modal-box" style="max-width: 800px;">
@@ -838,12 +974,12 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНЕ ВІКНО ВЕРХОВНОЇ АДМІНІСТРАЦІЇ -->
+    <!-- МОДАЛЬНЕ ВІКНО АДМІНІСТРАЦІЇ (УПОРЯДКОВАНО ПО ЗРОСТАННЮ) -->
     <div id="highAdminModal" class="modal-overlay" onclick="closeHighAdminModalOutside(event)">
         <div class="modal-box">
             <button class="modal-close" onclick="closeHighAdminModal()">&times;</button>
-            <div class="modal-icon"><i class="fa-solid fa-crown"></i></div>
-            <div class="modal-title">Верховна Адміністрація</div>
+            <div class="modal-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="modal-title">Адміністрація</div>
             <div class="admin-cards-list" id="high-admins-container"></div>
         </div>
     </div>
@@ -859,211 +995,237 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНЕ ВІКНО ПРАВИЛ (ПОВНЕ) -->
+    <!-- МОДАЛЬНЕ ВІКНО ПРАВИЛ -->
     <div id="rulesModal" class="modal-overlay" onclick="closeRulesModalOutside(event)">
-        <div class="modal-box" style="max-width: 780px;">
+        <div class="modal-box" style="max-width: 850px;">
             <button class="modal-close" onclick="closeRulesModal()">&times;</button>
             <div class="modal-icon"><i class="fa-solid fa-book-open"></i></div>
-            <div class="modal-title">Повний звід правил та законів сервера</div>
-            
+            <div class="modal-title">Звід правил проєкту Elite RP</div>
             <div class="rules-content-box">
                 <div class="rule-category">
-                    <h3>1. Правила та регламент адміністрації</h3>
-                    <div class="rule-item">
-                        <b>1.1. Статус адміністратора:</b> Адміністратор — ООС (Out Of Character) представник проєкту, який відповідає за дотримання правил сервера, допомогу гравцям, розгляд скарг та підтримання порядку. Адміністратор не є звичайним гравцем із привілеями. Усі його дії повинні бути об’єктивними, зрозумілими та спрямованими на розвиток проєкту.<br>
-                        <b>Режими:</b> 1. Адмін-режим (розглядає репорти, стежить за порушеннями, допомагає гравцям, використовує адмін-команди виключно у службових цілях). 2. Ігровий режим (грає як звичайний гравець).<br>
-                        <b>Забороняється в ігровому режимі:</b> використовувати адмін-команди для отримання переваги; використовувати службову інформацію; використовувати функції Fly, NoClip, Teleport, Watch, Spectate, Broadcast, Vanish, Admin Transport та інші адміністративні можливості в особистих цілях; втручатися в RP-ситуації без необхідності. Адміністратору заборонено змішувати ігровий та адміністративний режими.<br>
-                        <span class="punishment">Внутрішнє покарання: догана / сувора догана / зняття з посади.</span>
-                    </div>
-                    <div class="rule-item">
-                        <b>1.2. Основні обов’язки адміністратора:</b> Адміністратор зобов’язаний дотримуватися правил проєкту, бути ввічливим із гравцями, своєчасно відповідати на репорти, видавати покарання лише відповідно до правил проєкту, зберігати нейтралітет, поважати керівництво та адміністрацію.<br>
-                        <span class="punishment">Внутрішнє покарання: догана.</span>
-                    </div>
-                    <div class="rule-item">
-                        <b>1.3. Адміністратору забороняється:</b> зловживати службовими повноваженнями; видавати покарання без причини; видавати або знімати покарання знайомим без належних підстав; передавати службову інформацію; ображати гравців; ігнорувати репорти; писати в тему не по темі.<br>
-                        <i>Окремий пункт:</i> адміністратор якщо в правилах немає такого правила може сам видати покарання.<br>
-                        <span class="punishment">Внутрішнє покарання: сувора догана / зняття з посади.</span>
-                    </div>
+                    <h3>1. Регламент адміністрації</h3>
+                    <div class="rule-item">1.1 Адміністратор є обличчям проєкту і зобов'язаний дотримуватися моральних норм. <span class="punishment">[Покарання: Виговор / Зняття]</span></div>
+                    <div class="rule-item">1.2 Заборонено використовувати адмін-привілеї в особистих цілях та на користь третіх осіб. <span class="punishment">[Покарання: Зняття + ЧС]</span></div>
+                    <div class="rule-item">1.3 Адміністратор зобов'язаний мати відеодокази порушення гравця при видачі покарання та зберігати їх протягом 3 днів. <span class="punishment">[Покарання: Попередження]</span></div>
                 </div>
-
                 <div class="rule-category">
-                    <h3>2. Базові RolePlay терміни та ігрова валюта</h3>
-                    <div class="rule-item"><b>Ігрова валюта:</b> RP Валюта — Українська Гривня (₴): Оскільки сервер відтворює український сетинг, уся візуальна та системна валюта євро (€), що відображається в інтерфейсі гри, у RP-процесі, кодексах та діалогах прирівнюється і вважається Українською Гривнею (₴).</div>
-                    <div class="rule-item"><b>NonRP (Non-Roleplay):</b> Порушення логіки RolePlay-гри. Дії всупереч здоровому глузду чи физиці реального світу (стрільба зі стрибками). <span class="punishment">Покарання: Попередження або Kick.</span></div>
-                    <div class="rule-item"><b>RDM (Random Deathmatch):</b> Завдання шкоди або вбивство без RP-причини та активної RP-ситуації. <span class="punishment">Покарання: Бан від 1 до 3 днів.</span></div>
-                    <div class="rule-item"><b>VDM (Vehicle Deathmatch):</b> Навмисне збивання, наїзд на гравців або умисний таран чужих авто без RP-причини. <span class="punishment">Покарання: Попередження або Kick.</span></div>
-                    <div class="rule-item"><b>MG (Metagaming):</b> Використання інформації з OOC-джерел (стріми, чати, Discord) у RP-процесі. <span class="punishment">Покарання: Попередження або Kick.</span></div>
-                    <div class="rule-item"><b>PG (Powergaming):</b> Перебільшення можливостей свого персонажа (напад з кулаками на озброєну людину). <span class="punishment">Покарання: Бан від 1 до 3 днів.</span></div>
-                    <div class="rule-item"><b>FearRP:</b> Обов'язок відігравати страх за життя, якщо націлена зброя або є чисельна перевага. <span class="punishment">Покарання: Бан від 1 до 3 днів.</span></div>
-                    <div class="rule-item"><b>TWD (Talking While Downed):</b> Розмови у тяжкопораненому стані («в ноку»). Мертві не розмовляють! <span class="punishment">Покарання: Попередження.</span></div>
-                    <div class="rule-item"><b>Cuff Rush:</b> Заборонено миттєво та без RP-причини надягати кайданки (тільки після фіксації порушення згідно з КК та попередження). <span class="punishment">Покарання: Бан 1 день.</span></div>
-                    <div class="rule-item"><b>Cuff Rush + Auto Jail:</b> Миттєве заковування та одразу відправка до в'язниці без суду. <span class="punishment">Покарання: Бан 2 дні.</span></div>
-                    <div class="rule-item"><b>NonRP Cop:</b> Порушення працівником поліції правил сервера та ПК. <span class="punishment">Покарання: Попередження.</span></div>
-                    <div class="rule-item"><b>Ухід від RP:</b> Навмисний вихід із гри або перехід у AFK під час затримання чи перестрілки. <span class="punishment">Покарання: Бан 7 днів.</span></div>
-                    <div class="rule-item"><b>NLR (Правило нового життя):</b> Після смерті повністю забуваються обставини; заборонено повертатися на місце загибелі 10 хвилин. <span class="punishment">Покарання: Попередження або Kick.</span></div>
-                    <div class="rule-item"><b>GTA Driving (NRD):</b> Нереалістична їзда, постійні навмисні тарани, їзда на спорткарах по горах та полях. <span class="punishment">Покарання: Попередження або Kick.</span></div>
-                    <div class="rule-item"><b>Абуз скутера під час розшуку:</b> Використання скутера для втечі від поліції. <span class="punishment">Покарання: Попередження або Kick.</span></div>
+                    <h3>2. Базові RolePlay терміни</h3>
+                    <div class="rule-item"><b>NonRP (Non-Roleplay)</b> — нереалістична поведінка, що суперечить логіці реального життя. <span class="punishment">[Покарання: Деморган 30-60 хв]</span></div>
+                    <div class="rule-item"><b>RDM (Random Deathmatch)</b> — вбивство або завдання шкоди гравцю без IC причини. <span class="punishment">[Покарання: Варн / Бан 3 дні]</span></div>
+                    <div class="rule-item"><b>VDM (Vehicle Deathmatch)</b> — навмисне вбивство або завдання шкоди за допомогою транспортного засобу. <span class="punishment">[Покарання: Деморган 60 хв]</span></div>
+                    <div class="rule-item"><b>MG (Metagaming)</b> — використання OOC (реальної) інформації в IC (ігровому) чаті. <span class="punishment">[Покарання: Мут 20 хв]</span></div>
+                    <div class="rule-item"><b>PG (Powergaming)</b> — перебільшення можливостей свого персонажа (наприклад, бій 1 проти 3). <span class="punishment">[Покарання: Деморган 40 хв]</span></div>
+                    <div class="rule-item"><b>FearRP</b> — відсутність страху за своє життя у відповідних ситуаціях (зброя біля голови тощо). <span class="punishment">[Покарання: Деморган 40 хв]</span></div>
+                    <div class="rule-item"><b>NLR (New Life Rule)</b> — правило нового життя після смерті (заборонено повертатися на місце смерті 15 хв). <span class="punishment">[Покарання: Деморган 30 хв]</span></div>
+                    <div class="rule-item"><b>TWD (Talking While Dead)</b> — розмова або передача інформації у тяжкопораненому стані. <span class="punishment">[Покарання: Мут 30 хв]</span></div>
+                    <div class="rule-item"><b>Cuff Rush</b> — надягання кайданкок без попередньої відігровки або у бігу. <span class="punishment">[Покарання: Деморган 40 хв]</span></div>
                 </div>
-
                 <div class="rule-category">
-                    <h3>3. Статут та правила Національної поліції</h3>
-                    <div class="rule-item"><b>ПОЛ-101 (Статус поліції):</b> Державна RP-фракція для порядку в місті, затримань та охорони громадян. <span class="punishment">Покарання: догана.</span></div>
-                    <div class="rule-item"><b>ПОЛ-102 (Підрозділи):</b> Патрульна служба, Дорожня поліція, КОРД. Кожен робить свою роботу. <span class="punishment">Покарання: догана.</span></div>
-                    <div class="rule-item"><b>ПОЛ-203 & 204 (Заборони):</b> Заборонено NonRP Cop, використання посади заради особистої вигоди чи помсти. <span class="punishment">Покарання: звільнення.</span></div>
-                    <div class="rule-item"><b>ПОЛ-301 & 302 (Транспорт):</b> Службове авто тільки для роботи; заборонено використовувати для перегонів чи розваг. <span class="punishment">Покарання: догана.</span></div>
-                    <div class="rule-item"><b>ПОЛ-401 & 404 (Сила):</b> Зброя та силове затримання (Cuff Rush) без причини заборонені. <span class="punishment">Покарання: звільнення.</span></div>
+                    <h3>3. Статут Національної поліції</h3>
+                    <div class="rule-item">3.1 Співробітник поліції зобов'язаний бути ввічливим до громадян незалежно від їхнього статусу.</div>
+                    <div class="rule-item">3.2 Заборонено відкривати вогонь без попереджувального пострілу (окрім загрози життю). <span class="punishment">[Покарання: Звільнення + Деморган]</span></div>
+                    <div class="rule-item">3.3 Заборонено брати хабарі та перевищувати службові повноваження (NonRP Cop). <span class="punishment">[Покарання: Варн / Бан]</span></div>
                 </div>
-
                 <div class="rule-category">
                     <h3>4. Правила дорожнього руху (ПДР)</h3>
-                    <div class="rule-item">
-                        • 1.1 Проїзд на червоне світло — Штраф: 2000 ₴<br>
-                        • 1.2 Ігнорування дорожніх знаків — Штраф: 1250 ₴<br>
-                        • 1.3 Перевищення швидкості — Штраф: 2000 ₴<br>
-                        • 1.4 Їзда по зустрічній смузі без RP-причини — Штраф: 2500 ₴<br>
-                        • 1.5 Небезпечні маневри між смугами — Штраф: 2000 ₴<br>
-                        • 1.6 Створення ДТП з виною гравця — Штраф: 4000 ₴<br>
-                        • 1.7 Втеча з місця ДТП — Штраф: 7000 ₴<br>
-                        • 1.8 Паркування у забороненому місці (парковки держустанов, зупинки, тротуари, мости, клумби, посеред дороги) — Штраф: 1000 ₴<br>
-                        • 1.9 Ігнорування вимоги поліції зупинитися — Штраф: 3500 ₴<br>
-                        • 1.10 Невикористання поворотника / різка зміна смуги — Штраф: 1500 ₴<br>
-                        • 1.12 Використання аварійки без причини — Штраф: 2225 ₴<br>
-                        • 1.13 Рух без фар з 18:00 до 7:00 або при поганій видимості (туман, дощ, сніг) — Штраф: 2300 ₴<br>
-                        • 1.14 Рух у темний час доби лише з габаритами — Штраф: 1500 ₴<br>
-                        • 1.15 Намірне вимкнення світла для уникнення погоні — Штраф: 2500 ₴<br>
-                        • 1.16 Неуступання дороги службовим машинам — Штраф: 2000 ₴<br>
-                        • 1.17 Поворот не з тої смуги — Штраф: 1000 ₴<br>
-                        • 1.18 Рух з пробитим колесом тільки до 30 км/год і на аварійках — Штраф: 2000 ₴
-                    </div>
+                    <div class="rule-item">4.1 Рух транспортних засобів здійснюється виключно по правій стороні дороги. <span class="punishment">[Штраф: 500 ₴]</span></div>
+                    <div class="rule-item">4.2 Заборонено проїжджати на червоний сигнал світлофора. <span class="punishment">[Штраф: 800 ₴]</span></div>
+                    <div class="rule-item">4.3 Паркування у недозволених місцях (на проїжджій частині, тротуарах). <span class="punishment">[Штраф: 1000 ₴ + евакуація]</span></div>
+                    <div class="rule-item">4.4 Їзда у нетверезому стані або керування авто з критичними пошкодженнями. <span class="punishment">[Штраф: 1500 ₴ + вилучення прав]</span></div>
                 </div>
-
                 <div class="rule-category">
                     <h3>5. Кримінальний кодекс (КК)</h3>
-                    <div class="rule-item"><b>КК-101 — КК-104 (Пограбування):</b> Пограбування Головного Банку, Ювелірного магазину, каси або злам автоматів. Наслідок: штурм спецпідрозділу СБУ-КОРД, затримання та передача справи до суду.</div>
-                    <div class="rule-item"><b>КК-201 (Відкрита зброя):</b> Носіння зброї в руках у місті без прямої загрози. <span class="punishment">Покарання: силовий арешт, вилучення зброї та суд.</span></div>
-                    <div class="rule-item"><b>КК-202 — КК-206:</b> Посягання на життя держслужбовців (вогонь у відповідь), захоплення заручників, втеча від поліції, пошкодження майна.</div>
+                    <div class="rule-item">5.1 <b>КК-101:</b> Напад на мирного громадянина з використанням зброї. <span class="punishment">[Термін: 3 роки тюрми]</span></div>
+                    <div class="rule-item">5.2 <b>КК-201:</b> Відкрите носіння або зберігання зброї у громадських місцях без ліцензії. <span class="punishment">[Штраф 2000 ₴ + конфіскація]</span></div>
+                    <div class="rule-item">5.3 <b>КК-305:</b> Посягання на життя працівника державних органів / держслужбовця. <span class="punishment">[Термін: 5 років тюрми]</span></div>
                 </div>
-
                 <div class="rule-category">
-                    <h3>6. Адміністративний кодекс (АК) — тільки штрафи</h3>
-                    <div class="rule-item"><b>АК-101 (Хуліганство):</b> Образи, крики, колонки з музикою в громадських місцях, стрибки по авто. Штраф до 2000 ₴.</div>
-                    <div class="rule-item"><b>АК-102 (Хибний виклик):</b> Виклик поліції/медиків без причини. Штраф 3000 ₴.</div>
-                    <div class="rule-item"><b>АК-201 (Непокора поліції):</b> Відмова показати документи або вийти з авто. Штраф до 4000 ₴. *(Пам'ятка: при повторному порушенні через ліміт переказів викликається інший офіцер).*</div>
-                    <div class="rule-item"><b>АК-202 & 203:</b> Проникнення на закриту територію (парковка поліції, база СБУ-КОРД) та перешкоджання роботі екстрених служ. Штраф 2500–3000 ₴.</div>
-                    <div class="rule-item"><b>АК-203 (Переслідування):</b> Переслідування гравця заборонено (порушення права на приватність).</div>
+                    <h3>6. Адміністративний кодекс (АК)</h3>
+                    <div class="rule-item">6.1 <b>АК-101:</b> Дрібне хуліганство, нецензурна лайка в громадських місцях. <span class="punishment">[Штраф: 300 ₴]</span></div>
+                    <div class="rule-item">6.2 <b>АК-201:</b> Непокора законним вимогам представника влади. <span class="punishment">[Штраф: 1000 ₴ або арешт]</span></div>
+                    <div class="rule-item">6.3 <b>АК-302:</b> Хибний виклик екстрених служб (Поліція, ДСНС, МОЗ). <span class="punishment">[Штраф: 1200 ₴]</span></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- МОДАЛЬНЕ ВІКНО ПІДТРИМКИ -->
-    <div id="supportModal" class="modal-overlay" onclick="closeSupportModalOutside(event)">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeSupportModal()">&times;</button>
-            <div class="modal-icon"><i class="fa-solid fa-shield-halved"></i></div>
-            <div class="modal-title">Підтримка тех. адміністратора</div>
-            <p class="modal-text" style="text-align: center;">Підтримайте нашого тех. адміна <b>Moore</b>:</p>
-            <div class="requisites-box">
-                <div class="requisites-label">Monobank</div>
-                <div class="requisites-number" id="cardNumber">4874 0700 2007 2490</div>
-            </div>
-            <button class="btn-copy" onclick="copyCardNumber()">Скопіювати реквізити</button>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНЕ ВІКНО «НА СЕРВЕР» (ПОВНИЙ ТЕКСТ ТА ІНСТРУКЦІЯ) -->
-    <div id="serverModal" class="modal-overlay" onclick="closeServerModalOutside(event)">
-        <div class="modal-box">
-            <button class="modal-close" onclick="closeServerModal()">&times;</button>
-            <div class="modal-icon"><i class="fa-solid fa-gamepad"></i></div>
-            <div class="modal-title">Підключення до сервера</div>
-            <p class="modal-text" style="text-align: center; margin-bottom: 12px;">Вітаємо! Дякуємо, що вирішили зайти на сервер. Для входу на сервер перейдіть, натиснувши кнопку нижче:</p>
-            
-            <div style="text-align: center; margin-bottom: 15px;">
-                <a href="https://www.roblox.com/share?v=v2&code=5ihdm3h6ieiniy" target="_blank" class="server-link-btn">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> На сервер
-                </a>
-            </div>
-
-            <div class="instruction-box">
-                <b>Якщо не вдається зайти на сервер:</b><br>
-                Зайдіть у <b>ROBLOX</b>, у пошуку напишіть <b>Emergency Hamburg</b>. У грі відкрийте телефон, виберіть вкладку сервера, потім <b>Join to server by code</b> і введіть код: <b style="color: var(--gold-light); font-size: 13px;">pv6ccs55</b>
-            </div>
-
-            <div class="footer-greeting" style="font-size: 13px; color: var(--gold);">Приємної гри на Elite RP</div>
-        </div>
-    </div>
-
-    <!-- МОДАЛЬНЕ ВІКНО ФРАКЦІЙ (ПОВНЕ, З УСІМА КЕРІВНИКАМИ ТА ІЄРАРХІЄЮ) -->
+    <!-- МОДАЛЬНЕ ВІКНО ФРАКЦІЙ -->
     <div id="factionsModal" class="modal-overlay" onclick="closeFactionsModalOutside(event)">
-        <div class="modal-box">
+        <div class="modal-box" style="max-width: 650px;">
             <button class="modal-close" onclick="closeFactionsModal()">&times;</button>
             
             <div id="factionListScreen">
-                <div class="modal-icon"><i class="fa-solid fa-sitemap"></i></div>
-                <div class="faction-info-text">Вітаю! Тут ви можете ознайомитись з усіма фракціями сервера та їхніми обов'язками.</div>
-                <button class="btn-hierarchy" onclick="showHierarchyScreen()"><i class="fa-solid fa-layer-group"></i> Ієрархія фракцій</button>
+                <div class="modal-icon"><i class="fa-solid fa-users-rectangle"></i></div>
+                <div class="modal-title">Державні та силові структури</div>
+                <p class="modal-text" style="text-align: center;">Оберіть фракцію, щоб переглянути інформацію про керівництво та діяльність:</p>
+                
+                <button class="btn-hierarchy" onclick="showHierarchyScreen()"><i class="fa-solid fa-sitemap"></i> Переглянути ієрархію державних органів</button>
 
                 <div class="factions-scroll-list">
-                    <div class="faction-card-item" onclick="showLeaderInfo('Служба Безпеки України', 'cnfcsr35', 'hokahoka200_14973')">
-                        <div class="faction-card-title"><i class="fa-solid fa-shield"></i> Служба Безпеки України</div>
-                        <div class="faction-card-desc">Контррозвідка, боротьба з тероризмом, захист державної таємниці.</div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Служба Безпеки України (СБУ)', 'cnfcsr35', 'hokahoka200_14973')">
+                        <div class="faction-card-title"><i class="fa-solid fa-shield-halved" style="color:var(--gold);"></i> Служба Безпеки України</div>
+                        <div class="faction-card-desc">Контррозвідка, боротьба з тероризмом та захист державної безпеки.</div>
                     </div>
                     <div class="faction-card-item" onclick="showLeaderInfo('Судова Влада', 'domytik', 'zeleboba3._80058')">
-                        <div class="faction-card-title"><i class="fa-solid fa-gavel"></i> Судова Влада</div>
-                        <div class="faction-card-desc">Здійснення правосуддя, розгляд справ, ордери.</div>
+                        <div class="faction-card-title"><i class="fa-solid fa-scale-balanced" style="color:var(--gold);"></i> Судова Влада</div>
+                        <div class="faction-card-desc">Розгляд кримінальних та цивільних справ, контроль законності.</div>
                     </div>
-                    <div class="faction-card-item" onclick="showLeaderInfo('Державне Бюро Розслідувань', null, null)">
-                        <div class="faction-card-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Державне Бюро Розслідувань</div>
-                        <div class="faction-card-desc">Розслідування посадових злочинів чиновників та правоохоронців.</div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Державне Бюро Розслідувань (ДБР)', null, null)">
+                        <div class="faction-card-title"><i class="fa-solid fa-building-shield" style="color:var(--gold);"></i> Державне Бюро Розслідувань</div>
+                        <div class="faction-card-desc">Розслідування злочинів, скоєних вищими службовими особами.</div>
                     </div>
-                    <div class="faction-card-item" onclick="showLeaderInfo('Збройні Сили України', 'domytik', 'zeleboba3._80058')">
-                        <div class="faction-card-title"><i class="fa-solid fa-person-rifle"></i> Збройні Сили України</div>
-                        <div class="faction-card-desc">Охорона суверенітету та захист кордонів.</div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Збройні Сили України (ЗСУ)', 'domytik', 'zeleboba3._80058')">
+                        <div class="faction-card-title"><i class="fa-solid fa-jet-fighter" style="color:var(--gold);"></i> Збройні Сили України</div>
+                        <div class="faction-card-desc">Оборона країни, стратегічні об'єкти та забезпечення військової безпеки.</div>
                     </div>
-                    <div class="faction-card-item" onclick="showLeaderInfo('Національна Поліція України', 'domytik', 'zeleboba3._80058')">
-                        <div class="faction-card-title"><i class="fa-solid fa-user-shield"></i> Національна Поліція України</div>
-                        <div class="faction-card-desc">Забезпечення громадського порядку та патрулювання.</div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Національна Поліція України (НПУ)', 'domytik', 'zeleboba3._80058')">
+                        <div class="faction-card-title"><i class="fa-solid fa-car-burst" style="color:var(--gold);"></i> Національна Поліція України</div>
+                        <div class="faction-card-desc">Захист прав громадян, патрулювання міста та боротьба зі злочинністю.</div>
                     </div>
                     <div class="faction-card-item" onclick="showLeaderInfo('Спецпідрозділ КОРД', 'gorodok2001', 'gorodok2002')">
-                        <div class="faction-card-title"><i class="fa-solid fa-mask-skull"></i> Спецпідрозділ КОРД</div>
-                        <div class="faction-card-desc">Штурмові операції та затримання особливо небезпечних.</div>
+                        <div class="faction-card-title"><i class="fa-solid fa-user-ninja" style="color:var(--gold);"></i> Спецпідрозділ КОРД</div>
+                        <div class="faction-card-desc">Силові затримання, штурми та звільнення заручників.</div>
                     </div>
-                    <div class="faction-card-item" onclick="showLeaderInfo('Державна Служба Надзвичайних Ситуацій', null, null)">
-                        <div class="faction-card-title"><i class="fa-solid fa-fire-extinguisher"></i> ДСНС України</div>
-                        <div class="faction-card-desc">Ліквідація пожеж та рятувальні роботи.</div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Державна Служба Надзвичайних Ситуацій (ДСНС)', null, null)">
+                        <div class="faction-card-title"><i class="fa-solid fa-fire-extinguisher" style="color:var(--gold);"></i> ДСНС</div>
+                        <div class="faction-card-desc">Порятунок людей, гасіння пожеж та ліквідація наслідків ДТП.</div>
                     </div>
-                    <div class="faction-card-item" onclick="showLeaderInfo('Міністерство Охорони Здоров\'я', null, null)">
-                        <div class="faction-card-title"><i class="fa-solid fa-notes-medical"></i> Міністерство Охорони Здоров'я</div>
-                        <div class="faction-card-desc">Медична допомога та лікування громадян.</div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Міністерство Охорони Здоров\'я (МОЗ)', null, null)">
+                        <div class="faction-card-title"><i class="fa-solid fa-hospital" style="color:var(--gold);"></i> Міністерство Охорони Здоров'я</div>
+                        <div class="faction-card-desc">Надання медичної допомоги, лікування та реанімація громадян.</div>
                     </div>
                 </div>
             </div>
 
+            <!-- ЕКРАН ІНФОРМАЦІЇ ПРО ЛІДЕРА -->
             <div id="factionLeaderScreen" style="display: none;">
-                <div class="modal-title" id="displayFactionName" style="font-size: 18px; color: var(--gold-light); margin-bottom: 20px;"></div>
+                <div class="modal-title" id="displayFactionName" style="margin-bottom: 20px;">Фракція</div>
                 <div class="leader-card-box" id="leaderDetailBox"></div>
-                <button class="btn-back-factions" onclick="backToFactionsList()"><i class="fa-solid fa-arrow-left"></i> Назад до фракцій</button>
+                <button class="btn-back-factions" onclick="backToFactionsList()"><i class="fa-solid fa-arrow-left"></i> Назад до списку</button>
             </div>
 
+            <!-- ЕКРАН ІЄРАРХІЇ -->
             <div id="hierarchyScreen" style="display: none;">
-                <div class="modal-title" style="font-size: 18px; color: var(--gold-light); margin-bottom: 15px;">Ієрархія державних структур</div>
+                <div class="modal-title" style="margin-bottom: 20px;">Ієрархія державних органів</div>
                 <div class="hierarchy-list">
-                    <div class="hierarchy-item"><div class="hierarchy-rank">1 Ранг</div><div class="hierarchy-name">Судова Влада</div></div>
-                    <div class="hierarchy-item"><div class="hierarchy-rank">2 Ранг</div><div class="hierarchy-name">СБУ / ДБР</div></div>
-                    <div class="hierarchy-item"><div class="hierarchy-rank">3 Ранг</div><div class="hierarchy-name">Збройні Сили України</div></div>
-                    <div class="hierarchy-item"><div class="hierarchy-rank">4 Ранг</div><div class="hierarchy-name">НПУ (включно з КОРД)</div></div>
-                    <div class="hierarchy-item"><div class="hierarchy-rank">5 Ранг</div><div class="hierarchy-name">ДСНС / МОЗ</div></div>
+                    <div class="hierarchy-item">
+                        <div class="hierarchy-rank">Судова Влада</div>
+                        <div class="hierarchy-name">Голова Суду ➔ Суддя ➔ Секретар суду</div>
+                    </div>
+                    <div class="hierarchy-item">
+                        <div class="hierarchy-rank">Служба Безпеки України (СБУ)</div>
+                        <div class="hierarchy-name">Голова СБУ ➔ Заступник ➔ Слідчий ➔ Оперативник ➔ Стажер</div>
+                    </div>
+                    <div class="hierarchy-item">
+                        <div class="hierarchy-rank">Державне Бюро Розслідувань (ДБР)</div>
+                        <div class="hierarchy-name">Директор ➔ Заступник ➔ Старший слідчий ➔ Детектив</div>
+                    </div>
+                    <div class="hierarchy-item">
+                        <div class="hierarchy-rank">Збройні Сили України (ЗСУ)</div>
+                        <div class="hierarchy-name">Генерал ➔ Полковник ➔ Підполковник ➔ Майор ➔ Капітан ➔ Рядовий</div>
+                    </div>
+                    <div class="hierarchy-item">
+                        <div class="hierarchy-rank">Національна Поліція України (НПУ)</div>
+                        <div class="hierarchy-name">Генерал ➔ Полковник ➔ Майор ➔ Капітан ➔ Лейтенант ➔ Сержант ➔ Кадет</div>
+                    </div>
+                    <div class="hierarchy-item">
+                        <div class="hierarchy-rank">Спецпідрозділ КОРД</div>
+                        <div class="hierarchy-name">Командир ➔ Заступник ➔ Інструктор ➔ Бєєць КОРД ➔ Стажер</div>
+                    </div>
+                    <div class="hierarchy-item">
+                        <div class="hierarchy-rank">ДСНС та МОЗ</div>
+                        <div class="hierarchy-name">Начальник ➔ Заступник ➔ Головний лікар / Старший черговий ➔ Спеціаліст ➔ Інтерн</div>
+                    </div>
                 </div>
-                <button class="btn-back-factions" onclick="backToFactionsList()"><i class="fa-solid fa-arrow-left"></i> Назад</button>
+                <button class="btn-back-factions" onclick="backToFactionsList()"><i class="fa-solid fa-arrow-left"></i> Назад до списку</button>
             </div>
+
         </div>
     </div>
 
-    <!-- FIREBASE ТА ПОВНА ЛОГІКА -->
-<script type="module">
+    <!-- МОДАЛЬНЕ ВІКНО ІНФО ПРО СЕРВЕР -->
+    <div id="serverModal" class="modal-overlay" onclick="closeServerModalOutside(event)">
+        <div class="modal-box" style="max-width: 500px;">
+            <button class="modal-close" onclick="closeServerModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-server"></i></div>
+            <div class="modal-title">Як зайти на сервер</div>
+            <div class="instruction-box">
+                <b>1.</b> Відкрийте Roblox та знайдіть гру <b>Emergency Hamburg</b>.<br>
+                <b>2.</b> Зайдіть у меню телефону всередині гри.<br>
+                <b>3.</b> Перейдіть у розділ приватних серверів.<br>
+                <b>4.</b> Введіть унікальний код підключення:
+            </div>
+            <div class="requisites-box" style="margin-bottom: 15px;">
+                <div class="requisites-label">Код сервера</div>
+                <div class="requisites-number" id="serverCodeText" style="color: var(--gold-light);">pv6ccs55</div>
+            </div>
+            <button class="btn-copy" onclick="copyServerCode()" style="margin-bottom: 15px;"><i class="fa-solid fa-copy"></i> Скопіювати код сервера</button>
+            <a href="https://www.roblox.com/games/7361824707/Emergency-Hamburg" target="_blank" class="server-link-btn"><i class="fa-solid fa-gamepad"></i> Відкрити Roblox</a>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ДОНАТУ ТЕХ. АДМІНІСТРАТОРУ -->
+    <div id="supportModal" class="modal-overlay" onclick="closeSupportModalOutside(event)">
+        <div class="modal-box" style="max-width: 450px;">
+            <button class="modal-close" onclick="closeSupportModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <div class="modal-title">Підтримка тех. адміністратора</div>
+            <p class="modal-text" style="text-align: center;">Ви можете підтримати розробку та утримання нашого порталу донатом на рахунок Monobank:</p>
+            <div class="requisites-box">
+                <div class="requisites-label">Картка Monobank</div>
+                <div class="requisites-number">4874 0700 2007 2490</div>
+            </div>
+            <button class="btn-copy" onclick="copyCardNumber()"><i class="fa-solid fa-copy"></i> Скопіювати реквізити</button>
+        </div>
+    </div>
+    <div id="applyFactionsModal" class="modal-overlay" onclick="if(event.target===this)closeM('applyFactionsModal')">
+ <div class="modal-box" style="max-width:600px"><button class="modal-close" onclick="closeM('applyFactionsModal')">&times;</button>
+  <div class="modal-icon"><i class="fa-solid fa-file-signature"></i></div><div class="modal-title">Анкета у фракцію</div>
+  <p class="modal-text" style="text-align:center">Доступні фракції, у яких є лідер:</p>
+  <div class="factions-scroll-list" id="apply-factions-list"></div></div></div>
+
+<div id="applyFormModal" class="modal-overlay" onclick="if(event.target===this)closeM('applyFormModal')">
+ <div class="modal-box" style="max-width:720px"><button class="modal-close" onclick="closeM('applyFormModal')">&times;</button>
+  <div class="app-head"><i id="app-sticker-l" class="app-sticker fa-solid fa-shield-halved"></i>
+   <div style="text-align:center"><div class="app-head-sub">Офіційний бланк • Elite RP</div><div class="app-head-title">Анкета на вступ до<br><span id="app-faction-title" style="color:var(--gold-light)"></span></div></div>
+   <i id="app-sticker-r" class="app-sticker fa-solid fa-shield-halved"></i></div>
+  <div class="rules-content-box" id="app-form-fields" style="max-height:420px;gap:0"></div>
+  <button class="btn-auth-main" onclick="submitApplication()"><i class="fa-solid fa-paper-plane"></i> Надіслати анкету</button></div></div>
+
+<div id="reviewModal" class="modal-overlay" onclick="if(event.target===this)closeM('reviewModal')">
+ <div class="modal-box" style="max-width:820px"><button class="modal-close" onclick="closeM('reviewModal')">&times;</button>
+  <div id="reviewScreenList"><div class="modal-icon" style="color:#13a8b3"><i class="fa-solid fa-clipboard-check"></i></div><div class="modal-title">Перевірка анкет</div>
+   <p class="modal-text" style="text-align:center">Оберіть фракцію:</p><div class="factions-scroll-list" id="review-factions-list"></div></div>
+  <div id="reviewScreenDetail" style="display:none"><div class="modal-title" id="review-faction-title" style="margin-bottom:5px"></div>
+   <div class="rv-tabs"><button class="rv-tab pending" data-t="pending" onclick="setRevTab('pending')">Очікування</button><button class="rv-tab rejected" data-t="rejected" onclick="setRevTab('rejected')">Відхилені</button><button class="rv-tab approved" data-t="approved" onclick="setRevTab('approved')">Схвалені</button></div>
+   <div class="rules-content-box" id="review-apps-list" style="max-height:400px"></div>
+   <button class="btn-back-factions" style="margin-top:15px" onclick="openReviewModal()"><i class="fa-solid fa-arrow-left"></i> До фракцій</button></div></div></div>
+
+<div id="myRequestsModal" class="modal-overlay" onclick="if(event.target===this)closeM('myRequestsModal')">
+ <div class="modal-box" style="max-width:640px"><button class="modal-close" onclick="closeM('myRequestsModal')">&times;</button>
+  <div class="modal-icon"><i class="fa-solid fa-inbox"></i></div><div class="modal-title">Мої звернення</div>
+  <div class="rules-content-box" id="my-requests-list" style="max-height:430px"></div></div></div>
+
+<div id="accountViewModal" class="modal-overlay" onclick="if(event.target===this)closeM('accountViewModal')">
+ <div class="modal-box" style="max-width:420px"><button class="modal-close" onclick="closeM('accountViewModal')">&times;</button>
+  <div class="modal-title">Акаунт гравця</div><div class="leader-card-box" id="account-view-box"></div></div></div>
+
+<div id="textPromptModal" class="modal-overlay" style="z-index:6000" onclick="if(event.target===this)closeM('textPromptModal')">
+ <div class="modal-box" style="max-width:480px"><button class="modal-close" onclick="closeM('textPromptModal')">&times;</button>
+  <div class="modal-title" id="tp-title" style="font-size:18px"></div>
+  <textarea id="tp-text" class="auth-input" rows="4" style="resize:none;margin-bottom:12px"></textarea>
+  <button class="btn-auth-main" id="tp-ok">Підтвердити</button></div></div>
+
+<div id="decisionModal" class="modal-overlay" style="z-index:99990;background:rgba(0,0,0,.92)">
+ <div class="modal-box" style="max-width:560px"><button class="modal-close" onclick="closeDecision()">&times;</button>
+  <div class="modal-icon" id="dec-icon" style="font-size:64px"></div><div class="modal-title" id="dec-title"></div>
+  <div class="modal-text" id="dec-text" style="text-align:center;font-size:15px"></div><div id="dec-reason"></div>
+  <button class="btn-auth-main" onclick="closeDecision()">Зрозуміло</button></div></div>
+
+    <!-- SCRIPTS -->
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-        import { getDatabase, ref, get, set, child, onValue, remove } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+        import { getDatabase, ref, get, set, child, onValue, remove, push } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAjpHL-aaOQPZGK1CQHlrKvhEtOrYrsbvI",
@@ -1081,16 +1243,17 @@
         const DEFAULT_AVATAR = "https://i.postimg.cc/hPG3FjBV/50f72c47-ae9d-4cad-a659-19acf923f8d5.png";
 
         const ROLE_MAP = {
-            player: { l: "Player", c: "role-player", icon: "🎮" },
-            trainee: { l: "Trainee", c: "role-trainee", icon: "🌱" },
-            junioradmin: { l: "Junior Admin", c: "role-junioradmin", icon: "⭐" },
-            admin: { l: "Admin", c: "role-admin", icon: "🛡️" },
-            senioradmin: { l: "Senior Admin", c: "role-senioradmin", icon: "💫" },
-            headadmin: { l: "Head Admin", c: "role-headadmin", icon: "👑" },
-            deputyheadadmin: { l: "Deputy Head Admin", c: "role-deputyheadadmin", icon: "⚡" },
-            deputyowner: { l: "Deputy Owner", c: "role-deputyowner", icon: "💎" },
-            techadmin: { l: "Tech Admin", c: "role-techadmin", icon: "🔧" },
-            owner: { l: "Owner", c: "role-owner", icon: "🌟" }
+            player: { l: "Player", c: "role-player", icon: "🎮", rank: 1 },
+            factionleader: { l: "Лідер Фракції", c: "role-factionleader", icon: "🎖️", rank: 1.5 },
+            trainee: { l: "Trainee", c: "role-trainee", icon: "🌱", rank: 2 },
+            junioradmin: { l: "Junior Admin", c: "role-junioradmin", icon: "⭐", rank: 3 },
+            admin: { l: "Admin", c: "role-admin", icon: "🛡️", rank: 4 },
+            senioradmin: { l: "Senior Admin", c: "role-senioradmin", icon: "💫", rank: 5 },
+            headadmin: { l: "Head Admin", c: "role-headadmin", icon: "👑", rank: 6 },
+            deputyheadadmin: { l: "Deputy Head Admin", c: "role-deputyheadadmin", icon: "⚡", rank: 7 },
+            deputyowner: { l: "Deputy Owner", c: "role-deputyowner", icon: "💎", rank: 8 },
+            techadmin: { l: "Tech Admin", c: "role-techadmin", icon: "🔧", rank: 9 },
+            owner: { l: "Owner", c: "role-owner", icon: "🌟", rank: 10 }
         };
 
         const ALL_POSSIBLE_QUESTIONS = [
@@ -1169,7 +1332,9 @@
                     password: pass1,
                     age: age,
                     roles: ['player'],
-                    interview_status: 'none'
+                    interview_status: 'none',
+                    avatar: DEFAULT_AVATAR,
+                    glowColor: '#f3a82e'
                 });
 
                 alert("Реєстрація успішна!");
@@ -1180,8 +1345,9 @@
         function initSession(nick) {
             document.getElementById('auth-screen').style.display = 'none';
             set(ref(db, `online/${nick}`), { nickname: nick, time: Date.now() });
+            initFactionFeatures(nick);
 
-            // ОПТИМІЗОВАНИЙ СПИСОК ОНЛАЙН ГРАВЦІВ (БЕЗ ЛАГІВ)
+            // СПИСОК ОНЛАЙН ГРАВЦІВ
             onValue(ref(db, 'online'), async (snapshot) => {
                 const container = document.getElementById('online-users-container');
                 container.innerHTML = '';
@@ -1203,7 +1369,7 @@
                             const div = document.createElement('div');
                             div.className = 'online-user-item';
                             div.innerHTML = `
-                                <img src="${DEFAULT_AVATAR}" class="online-avatar">
+                                <img src="${u.avatar || DEFAULT_AVATAR}" class="online-avatar">
                                 <div class="online-info">
                                     <div class="online-nick">${u.nickname}</div>
                                     <div>${rolesHtml}</div>
@@ -1215,12 +1381,20 @@
                 }
             });
 
-            // Оновлення профілю та ролей поточного юзера
+            // ДАНІ ПОТОЧНОГО ЮЗЕРА
             onValue(ref(db, `users/${nick}`), (snapshot) => {
                 if (snapshot.exists()) {
                     const u = snapshot.val();
                     document.getElementById('header-username').innerText = u.nickname;
                     document.getElementById('stat-nick').innerText = u.nickname;
+                    
+                    const userAvatar = u.avatar || DEFAULT_AVATAR;
+                    document.getElementById('header-user-ava').src = userAvatar;
+                    document.getElementById('acc-avatar-input').value = u.avatar || '';
+
+                    const userGlow = u.glowColor || '#f3a82e';
+                    document.getElementById('acc-glow-color').value = userGlow;
+                    document.documentElement.style.setProperty('--banner-glow', hexToRgba(userGlow, 0.45));
 
                     const roles = Array.isArray(u.roles) ? u.roles : ['player'];
                     let rolesHtml = '';
@@ -1232,22 +1406,29 @@
                         const rm = ROLE_MAP[rKey] || ROLE_MAP['player'];
                         rolesHtml += `<span class="role-badge ${rm.c}">${rm.icon} ${rm.l}</span>`;
                         if (rKey === 'techadmin') isTechAdmin = true;
-                        if (['deputyowner', 'techadmin', 'owner'].includes(rKey)) isHighAdmin = true;
+                        if (['headadmin', 'deputyheadadmin', 'senioradmin', 'admin', 'junioradmin', 'trainee', 'deputyowner', 'techadmin', 'owner'].includes(rKey)) isHighAdmin = true;
                     });
 
                     document.getElementById('header-roles-box').innerHTML = rolesHtml;
                     document.getElementById('btn-give-role-main').style.display = isTechAdmin ? 'inline-flex' : 'none';
+                    document.getElementById('btn-tech-support-main').style.display = isTechAdmin ? 'inline-flex' : 'none';
                     document.getElementById('interview-control-area').style.display = isHighAdmin ? 'block' : 'none';
                 }
             });
 
-            // ГЛОБАЛЬНЕ БЛОКУВАННЯ САЙТУ ДЛЯ ГРАВЦІВ ПІД ЧАС ОБЗВОНУ
+            // КІЛЬКІСТЬ ЗВЕРНЕНЬ ТЕХПІДТРИМКИ ДЛЯ ТЕХ. АДМІНІСТРАТОРА
+            onValue(ref(db, 'tech_support'), (snapshot) => {
+                const count = snapshot.exists() ? Object.keys(snapshot.val()).length : 0;
+                document.getElementById('support-requests-count').innerText = count;
+            });
+
+            // БЛОКУВАННЯ САЙТУ ПІД ЧАС ОБЗВОНУ
             onValue(ref(db, 'active_interview'), async (snapshot) => {
                 const uSnap = await get(child(ref(db), `users/${nick}`));
                 if (!uSnap.exists()) return;
                 const uData = uSnap.val();
                 const roles = Array.isArray(uData.roles) ? uData.roles : ['player'];
-                const isPlayerOnly = roles.length === 1 && roles.includes('player');
+                const isPlayerOnly = roles.every(r => ['player','factionleader'].includes(r));
 
                 const lockScreen = document.getElementById('interview-lock-screen');
                 const dismissBtn = document.getElementById('btn-dismiss-lock');
@@ -1298,6 +1479,333 @@
                     }
                 }
             });
+        }
+
+        function hexToRgba(hex, alpha) {
+            let c = hex.replace('#','');
+            if(c.length===3) c = c.split('').map(x => x+x).join('');
+            const num = parseInt(c,16);
+            return `rgba(${num>>16},${(num>>8)&255},${num&255},${alpha})`;
+        }
+
+        // КЕРУВАННЯ АКАУНТОМ
+        window.openAccountModal = function() { document.getElementById('accountModal').style.display = 'flex'; }
+        window.closeAccountModal = function() { document.getElementById('accountModal').style.display = 'none'; }
+        window.closeAccountModalOutside = function(e) { if (e.target.id === 'accountModal') closeAccountModal(); }
+
+        window.saveAccountChanges = async function() {
+            if (!currentUserNick) return;
+            const newAvatar = document.getElementById('acc-avatar-input').value.trim();
+            const newGlow = document.getElementById('acc-glow-color').value;
+
+            await set(ref(db, `users/${currentUserNick}/avatar`), newAvatar || DEFAULT_AVATAR);
+            await set(ref(db, `users/${currentUserNick}/glowColor`), newGlow);
+
+            document.documentElement.style.setProperty('--banner-glow', hexToRgba(newGlow, 0.45));
+            closeAccountModal();
+            alert("Зміни успішно збережено!");
+        }
+
+        // ТЕХПІДТРИМКА / ЧАТ
+        window.openTechChatModal = function() { document.getElementById('techChatModal').style.display = 'flex'; }
+        window.closeTechChatModal = function() { document.getElementById('techChatModal').style.display = 'none'; }
+        window.closeTechChatModalOutside = function(e) { if (e.target.id === 'techChatModal') closeTechChatModal(); }
+
+        window.submitTechSupportRequest = async function() {
+            const discord = document.getElementById('tech-discord-input').value.trim();
+            const problem = document.getElementById('tech-problem-input').value.trim();
+
+            if (!discord || !problem) return alert("Заповніть всі поля анкети!");
+
+            await push(ref(db, 'tech_support'), {
+                nickname: currentUserNick || 'Гість',
+                discord: discord,
+                problem: problem,
+                time: Date.now()
+            });
+
+            document.getElementById('tech-discord-input').value = '';
+            document.getElementById('tech-problem-input').value = '';
+            closeTechChatModal();
+            alert("Ваше звернення успішно надіслано в техпідтримку!");
+        }
+
+    // ================= АНКЕТИ У ФРАКЦІЇ / ЗВЕРНЕННЯ =================
+const $ = id => document.getElementById(id);
+window.closeM = id => { $(id).style.display = 'none'; };
+const showM = id => { $(id).style.display = 'flex'; };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fKey = n => n.replace(/[.#$\[\]\/]/g, '_');
+const rolesHtmlOf = r => (Array.isArray(r) ? r : ['player']).map(k => { const m = ROLE_MAP[String(k).toLowerCase().trim()] || ROLE_MAP.player; return `<span class="role-badge ${m.c}">${m.icon} ${m.l}</span>`; }).join('');
+const STATUS = {
+    pending:  { t: 'Очікує',       c: 'st-pending',  i: 'fa-hourglass-half' },
+    replied:  { t: 'Є відповідь',  c: 'st-replied',  i: 'fa-reply' },
+    approved: { t: 'Схвалено',     c: 'st-approved', i: 'fa-circle-check' },
+    rejected: { t: 'Відхилено',    c: 'st-rejected', i: 'fa-circle-xmark' }
+};
+const stBadge = s => { const x = STATUS[s] || STATUS.pending; return `<span class="st-badge ${x.c}"><i class="fa-solid ${x.i}"></i> ${x.t}</span>`; };
+
+// Фракції беруться з розділу "Фракції" (лише ті, де є лідер)
+function getFactions() {
+    const out = [];
+    document.querySelectorAll('#factionListScreen .faction-card-item').forEach(el => {
+        const m = (el.getAttribute('onclick') || '').match(/showLeaderInfo\('((?:[^'\\]|\\.)*)',\s*(null|'[^']*')/);
+        if (!m) return;
+        const name = m[1].replace(/\\'/g, "'");
+        out.push({ name, hasLeader: m[2] !== 'null', icon: (el.querySelector('i') || {}).className || 'fa-solid fa-shield-halved', key: fKey(name) });
+    });
+    return out;
+}
+
+function promptText(title, placeholder, required, cb) {
+    $('tp-title').innerText = title;
+    $('tp-text').value = ''; $('tp-text').placeholder = placeholder;
+    showM('textPromptModal');
+    $('tp-ok').onclick = async () => {
+        const v = $('tp-text').value.trim();
+        if (required && !v) return alert('Поле не може бути порожнім!');
+        closeM('textPromptModal');
+        await cb(v);
+    };
+}
+
+function initFactionFeatures(nick) {
+    // кнопка перевірки анкет лише для ролі "Лідер Фракції"
+    onValue(ref(db, `users/${nick}/roles`), snap => {
+        const roles = snap.exists() ? (Array.isArray(snap.val()) ? snap.val() : [snap.val()]) : [];
+        $('btn-review-apps').style.display = roles.includes('factionleader') ? 'inline-flex' : 'none';
+    });
+    // повідомлення про рішення (показується один раз)
+    onValue(ref(db, 'faction_applications'), snap => {
+        if (!snap.exists() || $('decisionModal').style.display === 'flex') return;
+        const all = snap.val();
+        for (const fk of Object.keys(all)) for (const id of Object.keys(all[fk])) {
+            const a = all[fk][id];
+            if (a.applicant === nick && (a.status === 'approved' || a.status === 'rejected') && !a.notified) {
+                return showDecision(`faction_applications/${fk}/${id}`, a);
+            }
+        }
+    });
+}
+
+let decisionPath = null;
+function showDecision(path, a) {
+    decisionPath = path;
+    const ok = a.status === 'approved';
+    $('dec-icon').innerHTML = ok ? '<i class="fa-solid fa-circle-check" style="color:#2ecc71"></i>' : '<i class="fa-solid fa-circle-xmark" style="color:#e74c3c"></i>';
+    $('dec-title').innerText = ok ? 'Анкету схвалено!' : 'Анкету відхилено';
+    $('dec-text').innerHTML = ok
+        ? `Вітаємо! Ваша анкета на вступ до <b style="color:var(--gold-light)">${esc(a.factionName)}</b> схвалена.`
+        : `На жаль, ваша анкета на вступ до <b style="color:var(--gold-light)">${esc(a.factionName)}</b> відхилена.`;
+    $('dec-reason').innerHTML = (!ok && a.reason) ? `<div class="reason-box"><b>Причина відхилення:</b><br>${esc(a.reason)}</div>` : '';
+    showM('decisionModal');
+}
+window.closeDecision = async function() {
+    closeM('decisionModal');
+    if (decisionPath) { const p = decisionPath; decisionPath = null; await set(ref(db, `${p}/notified`), true); }
+};
+
+// ----- Подача анкети -----
+const CHAT_CATS = ['Kids (до 8 років)', 'Select (9–12 років)', '13+', '17+', '18+'];
+function expQuestion(name) {
+    if (/Суд/.test(name)) return 'Чи є у вас досвід роботи в судових / юридичних структурах? (коротко)';
+    if (/ДСНС|МОЗ/.test(name)) return 'Чи є у вас досвід роботи в рятувальних / медичних фракціях? (коротко)';
+    return 'Чи є у вас досвід роботи в бойових фракціях (силових структурах)? (коротко)';
+}
+let applyFaction = null, applyFields = [];
+
+window.openApplyFactionsModal = function() {
+    const box = $('apply-factions-list'); box.innerHTML = '';
+    const list = getFactions().filter(f => f.hasLeader);
+    if (!list.length) box.innerHTML = '<div style="color:#888;text-align:center;padding:20px">Наразі немає фракцій з лідером</div>';
+    list.forEach(f => {
+        const d = document.createElement('div'); d.className = 'faction-card-item';
+        d.innerHTML = `<div class="faction-card-title"><i class="${f.icon}" style="color:var(--gold)"></i> ${esc(f.name)}</div><div class="faction-card-desc">Натисніть, щоб заповнити анкету</div>`;
+        d.onclick = () => openApplicationForm(f);
+        box.appendChild(d);
+    });
+    showM('applyFactionsModal');
+};
+
+function openApplicationForm(f) {
+    applyFaction = f;
+    $('app-faction-title').innerText = f.name;
+    $('app-sticker-l').className = `app-sticker ${f.icon}`;
+    $('app-sticker-r').className = `app-sticker ${f.icon}`;
+    applyFields = [
+        { id: 'a1', q: 'Ваше ім\'я в житті', t: 'text' },
+        { id: 'a2', q: 'Ваш вік у житті', t: 'number' },
+        { id: 'a3', q: 'Ваша активність (годин на день)', t: 'text' },
+        { id: 'a4', q: `Чому ви бажаєте вступити до лав: ${f.name}? (коротко)`, t: 'area' },
+        { id: 'a5', q: expQuestion(f.name), t: 'area' },
+        { id: 'a6', q: 'Чи є у вас Discord та змога говорити у войсі?', t: 'sel', o: ['Так, Discord є і можу говорити', 'Discord є, але говорити не можу', 'Discord немає'] },
+        { id: 'a7', q: 'Ваша вікова категорія чату Roblox', t: 'sel', o: CHAT_CATS },
+        { id: 'a8', q: 'Ваше знання правил серверу (0/10)', t: 'range' },
+        { id: 'a9', q: 'Скільки граєте на нашому сервері?', t: 'text' },
+        { id: 'a10', q: 'Ваша адекватність (0/10)', t: 'range' },
+        { id: 'a11', q: 'Ваш юзернейм та дисплей нік у Roblox', t: 'text' }
+    ];
+    const box = $('app-form-fields'); box.innerHTML = '';
+    applyFields.forEach((x, i) => {
+        let inp;
+        if (x.t === 'area') inp = `<textarea id="${x.id}" class="auth-input" rows="2" style="resize:none"></textarea>`;
+        else if (x.t === 'sel') inp = `<select id="${x.id}" class="auth-input">${x.o.map(o => `<option>${esc(o)}</option>`).join('')}</select>`;
+        else if (x.t === 'range') inp = `<input type="range" id="${x.id}" min="0" max="10" value="5" oninput="document.getElementById('${x.id}-v').innerText=this.value+'/10'"><span class="range-val" id="${x.id}-v">5/10</span>`;
+        else inp = `<input type="${x.t}" id="${x.id}" class="auth-input">`;
+        box.insertAdjacentHTML('beforeend', `<div class="app-field"><label>${i + 1}. ${esc(x.q)}</label>${inp}</div>`);
+    });
+    closeM('applyFactionsModal'); showM('applyFormModal');
+}
+
+window.submitApplication = async function() {
+    if (!currentUserNick || !applyFaction) return;
+    const answers = [];
+    for (const x of applyFields) {
+        let v = $(x.id).value.trim();
+        if (!v) return alert('Заповніть усі поля анкети!');
+        if (x.t === 'range') v += '/10';
+        answers.push({ q: x.q, a: v });
+    }
+    await push(ref(db, `faction_applications/${applyFaction.key}`), {
+        applicant: currentUserNick, factionName: applyFaction.name, answers,
+        status: 'pending', reason: '', notified: false, time: Date.now()
+    });
+    closeM('applyFormModal');
+    alert('Анкету успішно надіслано лідеру фракції!');
+};
+
+// ----- Перевірка анкет (лідер) -----
+let revF = null, revTab = 'pending';
+const showRev = s => { $('reviewScreenList').style.display = s === 'list' ? 'block' : 'none'; $('reviewScreenDetail').style.display = s === 'detail' ? 'block' : 'none'; };
+
+window.openReviewModal = async function() {
+    showM('reviewModal'); showRev('list');
+    const box = $('review-factions-list'); box.innerHTML = '<div style="color:#aaa">Завантаження...</div>';
+    const snap = await get(ref(db, 'faction_applications')); const all = snap.val() || {};
+    box.innerHTML = '';
+    getFactions().forEach(f => {
+        const n = Object.values(all[f.key] || {}).filter(a => a.status === 'pending').length;
+        const d = document.createElement('div'); d.className = 'faction-card-item';
+        d.innerHTML = `<div class="faction-card-title"><i class="${f.icon}" style="color:var(--gold)"></i> ${esc(f.name)} <span class="cnt-badge">${n}</span></div>`;
+        d.onclick = () => { revF = f; revTab = 'pending'; renderReview(); };
+        box.appendChild(d);
+    });
+};
+window.setRevTab = t => { revTab = t; renderReview(); };
+
+async function renderReview() {
+    showRev('detail');
+    $('review-faction-title').innerText = revF.name;
+    document.querySelectorAll('.rv-tab').forEach(b => b.classList.toggle('active', b.dataset.t === revTab));
+    const box = $('review-apps-list'); box.innerHTML = '<div style="color:#aaa">Завантаження...</div>';
+    const [aSnap, uSnap] = await Promise.all([get(ref(db, `faction_applications/${revF.key}`)), get(ref(db, 'users'))]);
+    const apps = aSnap.val() || {}, users = uSnap.val() || {};
+    const list = Object.keys(apps).map(id => ({ id, ...apps[id] })).filter(a => a.status === revTab).sort((x, y) => y.time - x.time);
+    box.innerHTML = '';
+    if (!list.length) return box.innerHTML = '<div style="color:#888;text-align:center;padding:25px">Анкет немає</div>';
+    list.forEach(a => {
+        const u = users[a.applicant] || {};
+        const card = document.createElement('div'); card.className = 'app-card';
+        card.innerHTML = `
+            <div class="app-card-user"><img src="${esc(u.avatar || DEFAULT_AVATAR)}" class="online-avatar">
+                <div class="online-info"><div class="online-nick">${esc(a.applicant)}</div><div>${rolesHtmlOf(u.roles)}</div></div>
+                <div style="margin-left:auto;text-align:right">${stBadge(a.status)}<div style="font-size:10px;color:#888;margin-top:4px">${new Date(a.time).toLocaleString()}</div></div></div>
+            ${(a.answers || []).map((x, i) => `<div class="app-qa"><b>${i + 1}. ${esc(x.q)}</b>${esc(x.a)}</div>`).join('')}
+            ${a.status === 'rejected' && a.reason ? `<div class="reason-box"><b>Причина:</b> ${esc(a.reason)}</div>` : ''}
+            ${a.status === 'pending' ? `<div class="app-actions"><button class="b-reject">Відхилити</button><button class="b-ok">Схвалити</button></div>` : ''}`;
+        if (a.status === 'pending') {
+            card.querySelector('.b-ok').onclick = async () => {
+                const p = `faction_applications/${revF.key}/${a.id}`;
+                await set(ref(db, `${p}/notified`), false); await set(ref(db, `${p}/status`), 'approved'); renderReview();
+            };
+            card.querySelector('.b-reject').onclick = () => promptText('Причина відхилення анкети', 'Вкажіть причину, її побачить гравець...', true, async reason => {
+                const p = `faction_applications/${revF.key}/${a.id}`;
+                await set(ref(db, `${p}/reason`), reason); await set(ref(db, `${p}/notified`), false); await set(ref(db, `${p}/status`), 'rejected'); renderReview();
+            });
+        }
+        box.appendChild(card);
+    });
+}
+
+// ----- Техпідтримка: адмін -----
+window.openTechSupportRequestsModal = async function() {
+    const container = $('tech-requests-list-container');
+    container.innerHTML = '<div style="color:#aaa;">Завантаження звернень...</div>';
+    showM('techRequestsModal');
+    const snapshot = await get(ref(db, 'tech_support'));
+    container.innerHTML = '';
+    if (!snapshot.exists()) return container.innerHTML = '<div style="color:#888;text-align:center;padding:20px">Нових звернень немає</div>';
+    const requests = snapshot.val();
+    Object.keys(requests).reverse().forEach(key => {
+        const r = requests[key], st = r.status || 'pending';
+        const card = document.createElement('div'); card.className = 'manage-user-card';
+        card.innerHTML = `
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                <span style="font-weight:800;font-size:14px;color:var(--gold-light)">${esc(r.nickname)}</span>${stBadge(st)}</div>
+            <div style="font-size:10px;color:#888;margin-bottom:6px">${new Date(r.time).toLocaleString()}</div>
+            <div style="font-size:12px;color:#5865F2;font-weight:700;margin-bottom:6px"><i class="fa-brands fa-discord"></i> ${esc(r.discord)}</div>
+            <div style="font-size:12px;color:#dcdcdc;background:rgba(0,0,0,.4);padding:10px;border-radius:8px">${esc(r.problem)}</div>
+            ${r.reply ? `<div class="reply-box"><b>Ваша відповідь:</b><br>${esc(r.reply)}</div>` : ''}
+            <div class="tech-actions">
+                <button class="b-neutral" data-a="acc"><i class="fa-solid fa-user"></i> Акаунт</button>
+                <button class="b-reject" data-a="rej">Відхилити</button>
+                <button class="b-reply" data-a="rep">Відповісти</button>
+                <button class="b-ok" data-a="ok">Схвалити</button>
+                <button class="b-neutral" data-a="del" style="flex:0 0 auto"><i class="fa-solid fa-trash"></i></button>
+            </div>`;
+        const on = (a, fn) => card.querySelector(`[data-a="${a}"]`).onclick = fn;
+        on('acc', () => openAccountView(r.nickname));
+        on('rej', async () => { await set(ref(db, `tech_support/${key}/status`), 'rejected'); openTechSupportRequestsModal(); });
+        on('ok', async () => { await set(ref(db, `tech_support/${key}/status`), 'approved'); openTechSupportRequestsModal(); });
+        on('rep', () => promptText('Відповідь на звернення', 'Напишіть відповідь гравцю...', true, async text => {
+            await set(ref(db, `tech_support/${key}/reply`), text);
+            await set(ref(db, `tech_support/${key}/status`), 'replied');
+            openTechSupportRequestsModal();
+        }));
+        on('del', async () => { if (confirm('Видалити звернення?')) { await remove(ref(db, `tech_support/${key}`)); openTechSupportRequestsModal(); } });
+        container.appendChild(card);
+    });
+};
+
+window.openAccountView = async function(nick) {
+    const box = $('account-view-box');
+    box.innerHTML = '<div style="color:#aaa">Завантаження...</div>'; showM('accountViewModal');
+    const snap = await get(ref(db, `users/${nick}`));
+    if (!snap.exists()) return box.innerHTML = '<div style="color:#e74c3c;font-weight:800">Акаунт не знайдено (гість або видалений)</div>';
+    const u = snap.val();
+    box.innerHTML = `<img src="${esc(u.avatar || DEFAULT_AVATAR)}" style="width:80px;height:80px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;margin-bottom:10px">
+        <div class="leader-nick-title">${esc(u.nickname)}</div><div style="margin:8px 0">${rolesHtmlOf(u.roles)}</div>
+        <div style="font-size:12px;color:#aaa">Вік: <b style="color:#fff">${esc(u.age || '—')}</b></div>`;
+};
+
+// ----- Мої звернення (гравець) -----
+window.openMyRequests = async function() {
+    if (!currentUserNick) return alert('Спочатку увійдіть в акаунт!');
+    const box = $('my-requests-list'); box.innerHTML = '<div style="color:#aaa">Завантаження...</div>';
+    showM('myRequestsModal');
+    const snap = await get(ref(db, 'tech_support')); const all = snap.val() || {};
+    const mine = Object.values(all).filter(r => r.nickname === currentUserNick).sort((a, b) => b.time - a.time);
+    box.innerHTML = '';
+    if (!mine.length) return box.innerHTML = '<div style="color:#888;text-align:center;padding:25px">У вас ще немає звернень</div>';
+    ['replied', 'pending', 'approved', 'rejected'].forEach(s => {
+        const items = mine.filter(r => (r.status || 'pending') === s);
+        if (!items.length) return;
+        box.insertAdjacentHTML('beforeend', `<div class="my-group-title">${stBadge(s)} <span style="color:#888">(${items.length})</span></div>`);
+        items.forEach(r => box.insertAdjacentHTML('beforeend', `
+            <div class="app-card" style="margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-bottom:8px"><span><i class="fa-brands fa-discord"></i> ${esc(r.discord)}</span><span>${new Date(r.time).toLocaleString()}</span></div>
+                <div style="font-size:12px;color:#dcdcdc">${esc(r.problem)}</div>
+                ${r.reply ? `<div class="reply-box"><b><i class="fa-solid fa-headset"></i> Відповідь техпідтримки:</b><br>${esc(r.reply)}</div>` : ''}
+            </div>`));
+    });
+};
+
+        window.closeTechRequestsModal = function() { document.getElementById('techRequestsModal').style.display = 'none'; }
+        window.closeTechRequestsModalOutside = function(e) { if (e.target.id === 'techRequestsModal') closeTechRequestsModal(); }
+
+        window.deleteTechRequest = async function(reqKey) {
+            await remove(ref(db, `tech_support/${reqKey}`));
+            openTechSupportRequestsModal();
         }
 
         window.openManageRolesModal = async function() {
@@ -1445,6 +1953,7 @@
             }
         }
 
+        // ВІКНО АДМІНІСТРАЦІЇ (СОРТУВАННЯ ПО ЗРОСТАННЮ РАНГУ)
         window.openHighAdminModal = async function() {
             const container = document.getElementById('high-admins-container');
             container.innerHTML = '<div style="color:#aaa;">Завантаження...</div>';
@@ -1454,31 +1963,41 @@
             container.innerHTML = '';
             if (snapshot.exists()) {
                 const users = snapshot.val();
+                let adminList = [];
+
                 Object.keys(users).forEach(uKey => {
                     const u = users[uKey];
                     const roles = Array.isArray(u.roles) ? u.roles : ['player'];
-                    let isHigh = false;
+                    let maxRank = 0;
                     let rolesHtml = '';
 
                     roles.forEach(r => {
                         const rKey = r.toLowerCase().trim();
-                        if (['headadmin', 'deputyheadadmin', 'senioradmin', 'admin', 'junioradmin', 'trainee', 'deputyowner', 'techadmin', 'owner'].includes(rKey)) isHigh = true;
                         const rm = ROLE_MAP[rKey] || ROLE_MAP['player'];
+                        if (rm.rank > maxRank) maxRank = rm.rank;
                         rolesHtml += `<span class="role-badge ${rm.c}">${rm.icon} ${rm.l}</span>`;
                     });
 
-                    if (isHigh) {
-                        const card = document.createElement('div');
-                        card.className = 'admin-card-item';
-                        card.innerHTML = `
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <img src="${DEFAULT_AVATAR}" style="width:36px; height:36px; border-radius:50%; border:1px solid var(--gold);">
-                                <span style="font-weight:800; font-size:14px;">${u.nickname}</span>
-                            </div>
-                            <div>${rolesHtml}</div>
-                        `;
-                        container.appendChild(card);
+                    // Показуємо усіх, хто має ранг вище ніж звичайний гравець (rank > 1)
+                    if (maxRank > 1) {
+                        adminList.push({ uKey, u, maxRank, rolesHtml });
                     }
+                });
+
+                // Сортування по зростанню рангу (від Trainee до Owner)
+                adminList.sort((a, b) => a.maxRank - b.maxRank);
+
+                adminList.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'admin-card-item';
+                    card.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <img src="${item.u.avatar || DEFAULT_AVATAR}" style="width:36px; height:36px; border-radius:50%; border:1px solid var(--gold);">
+                            <span style="font-weight:800; font-size:14px;">${item.u.nickname}</span>
+                        </div>
+                        <div>${item.rolesHtml}</div>
+                    `;
+                    container.appendChild(card);
                 });
             }
         }
@@ -1501,6 +2020,7 @@
         function closeSupportModalOutside(e) { if (e.target.id === 'supportModal') closeSupportModal(); }
         
         function copyCardNumber() { navigator.clipboard.writeText("4874070020072490").then(() => alert("Реквізити скопійовано!")); }
+        function copyServerCode() { navigator.clipboard.writeText("pv6ccs55").then(() => alert("Код сервера скопійовано!")); }
 
         function openServerModal() { document.getElementById('serverModal').style.display = 'flex'; }
         function closeServerModal() { document.getElementById('serverModal').style.display = 'none'; }
