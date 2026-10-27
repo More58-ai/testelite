@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite RP - Повний Релізний Код</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --gold: #f3a82e;
+            --gold-light: #ffd700;
+            --bg: #0c0a08;
+            --card-bg: rgba(22, 19, 15, 0.85);
+            --border-color: rgba(243, 168, 46, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        body, html {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* ФОНОВІ СЦЕНИ */
+        .background-scene {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/b/b2/Kyiv_Independence_Monument_2019.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -2;
+            filter: brightness(0.35) blur(6px);
+        }
+
+        .gradient-mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(12,10,8,0.3) 0%, rgba(12,10,8,0.92) 100%);
+            z-index: -1;
+        }
+
+        /* ЕКРАН БЛОКУВАННЯ ПІД ЧАС ОБЗВОНУ */
+        #interview-lock-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 0, 0, 0.96);
+            backdrop-filter: blur(20px);
+            z-index: 99999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .lock-icon-box {
+            font-size: 70px;
+            color: #ff3333;
+            margin-bottom: 20px;
+            animation: lockPulse 1.5s infinite alternate;
+        }
+
+        @keyframes lockPulse {
+            from { transform: scale(1); text-shadow: 0 0 10px rgba(255,51,51,0.5); }
+            to { transform: scale(1.1); text-shadow: 0 0 30px rgba(255,51,51,0.9); }
+        }
+
+        .lock-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+      .lock-desc {
+            font-size: 16px;
+            color: #ff9999;
+            max-width: 500px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* ЕКРАН АВТОРИЗАЦІЇ */
+        #auth-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(5, 5, 5, 0.92);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .auth-container {
+            background: linear-gradient(135deg, #181512 0%, #0c0a08 100%);
+            border: 2px solid var(--gold);
+            border-radius: 24px;
+            padding: 40px 35px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            box-shadow: 0 0 35px rgba(243, 168, 46, 0.35), inset 0 0 15px rgba(243, 168, 46, 0.1);
+        }
+
+        .auth-logo {
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--gold-light);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .auth-input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .auth-input-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(243, 168, 46, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .auth-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(243, 168, 46, 0.3);
+        }
+
+        .btn-auth-main {
+            width: 100%;
+            background: var(--gold);
+            color: #0c0a08;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 13px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(243, 168, 46, 0.3);
+        }
+
+        .btn-auth-main:hover { background: #ffb732; transform: translateY(-2px); }
+
+        .btn-auth-switch {
+            width: 100%;
+            background: transparent;
+            color: #b0b0b0;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-auth-switch:hover { background: rgba(255, 255, 255, 0.05); color: white; }
+
+        /* ХЕДЕР */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 6%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(12, 10, 8, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .header-logo-text {
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--gold-light);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #b3b3b3;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover, .nav-links a.active { color: white; }
+
+        .user-profile-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(243, 168, 46, 0.3);
+            padding: 5px 14px 5px 6px;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+
+        .user-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--gold);
+        }
+
+        /* РОЛІ ТА БАНЕРИ */
+        @keyframes flowGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .role-badge {
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 900;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-left: 3px;
+            background-size: 200% 200%;
+            animation: flowGradient 4s ease infinite;
+        }
+
+        .role-player { background: #ffffff; color: #000; border: 1px solid #ccc; }
+        .role-trainee { background: #0055ff; color: #fff; border: 1px solid #3385ff; box-shadow: 0 0 8px rgba(0,85,255,0.6); }
+        .role-junioradmin { background: #00e6b8; color: #000; border: 1px solid #80ffea; box-shadow: 0 0 8px rgba(0,230,184,0.6); }
+        .role-admin { background: #2ecc71; color: #000; border: 1px solid #55efc4; box-shadow: 0 0 8px rgba(46,204,113,0.6); }
+        .role-senioradmin { background: #8e44ad; color: #fff; border: 1px solid #9b59b6; box-shadow: 0 0 10px rgba(142,68,173,0.7); }
+        .role-headadmin { background: #c0392b; color: #fff; border: 1px solid #e74c3c; box-shadow: 0 0 10px rgba(192,57,43,0.7); }
+        .role-deputyheadadmin { background: #d35400; color: #fff; border: 1px solid #e67e22; box-shadow: 0 0 12px rgba(211,84,0,0.8); }
+        .role-deputyowner { background: linear-gradient(135deg, #4b0082, #8a2be2); color: #fff; border: 1px solid #da70d6; box-shadow: 0 0 12px rgba(138,43,226,0.8); }
+        .role-techadmin { background: linear-gradient(135deg, #ff7700, #ffaa00); color: #fff; border: 1px solid #ffcc00; box-shadow: 0 0 14px rgba(255,119,0,0.9); }
+        .role-owner { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); color: #1a1205; border: 1px solid #ffe87c; box-shadow: 0 0 15px rgba(255,215,0,0.85); }
+
+        /* MAIN WRAPPER */
+        .main-wrapper {
+            max-width: 1350px;
+            margin: 110px auto 50px;
+            padding: 0 3%;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 25px;
+        }
+
+        .content-area { display: flex; flex-direction: column; gap: 25px; }
+
+        /* БОКОВИЙ БЛОК ONLINE */
+        .sidebar-online-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 22px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(243, 168, 46, 0.2);
+            padding-bottom: 10px;
+        }
+
+        .online-users-list { display: flex; flex-direction: column; gap: 14px; max-height: 500px; overflow-y: auto; }
+        .online-user-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .online-avatar { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--gold); object-fit: cover; }
+        .online-info { display: flex; flex-direction: column; gap: 4px; align-items: flex-start; }
+        .online-nick { font-size: 13px; font-weight: 800; color: white; }
+
+        /* КНОПКА ВИДАЧІ ПОСАДИ (ТІЛЬКИ ДЛЯ TECH ADMIN) */
+        .btn-give-role-panel {
+            background: linear-gradient(135deg, #ff7700 0%, #ff3300 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 119, 0, 0.4);
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-give-role-panel:hover { transform: translateY(-2px); }
+
+        .manage-user-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(243, 168, 46, 0.2);
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 12px;
+            text-align: left;
+        }
+
+        .manage-roles-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+        .role-toggle-btn {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ccc;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .role-toggle-btn.active {
+            background: var(--gold);
+            color: #0c0a08;
+            border-color: var(--gold-light);
+            font-weight: 900;
+        }
+
+        /* ПАНЕЛЬ ОБЗВОНУ */
+        .interview-control-box {
+            background: rgba(255, 119, 0, 0.08);
+            border: 1px solid rgba(255, 119, 0, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-interview-start {
+            background: linear-gradient(135deg, #ff7700 0%, #ff3300 100%);
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 900;
+            font-size: 13px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 119, 0, 0.4);
+        }
+
+        .interview-active-screen {
+            background: rgba(20, 10, 0, 0.95);
+            border: 2px solid #ff7700;
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .interview-top-row { display: flex; align-items: center; justify-content: space-between; }
+        .interview-candidate-profile { display: flex; align-items: center; gap: 14px; }
+        .interview-cand-ava { width: 50px; height: 50px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
+        .interview-cand-details { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+        .interview-cand-nick { font-size: 16px; font-weight: 900; color: white; }
+        .interview-timer-box { font-size: 24px; font-weight: 900; color: var(--gold-light); font-family: monospace; background: rgba(0,0,0,0.6); padding: 6px 16px; border-radius: 10px; border: 1px solid var(--border-color); }
+        .interview-actions-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .btn-gen-questions { background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); color: white; padding: 12px 20px; border-radius: 10px; font-weight: 800; font-size: 12px; text-transform: uppercase; border: none; cursor: pointer; }
+        .btn-finish-interview-final { background: #e74c3c; color: white; padding: 12px 20px; border-radius: 10px; font-weight: 800; font-size: 12px; text-transform: uppercase; border: none; cursor: pointer; }
+
+        .test-question-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(243, 168, 46, 0.2);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .test-question-text { font-size: 13px; color: #e0e0e0; font-weight: 700; line-height: 1.4; }
+        .test-question-score-badge { font-size: 11px; background: rgba(243, 168, 46, 0.15); color: var(--gold-light); border: 1px solid rgba(243, 168, 46, 0.4); padding: 4px 8px; border-radius: 6px; white-space: nowrap; }
+        .test-checkbox-input { width: 20px; height: 20px; accent-color: var(--gold); cursor: pointer; }
+
+        .interview-result-choice-box { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .btn-result-passed { background: #2ecc71; color: white; padding: 14px 28px; border-radius: 12px; font-weight: 900; font-size: 13px; border: none; cursor: pointer; }
+        .btn-result-failed { background: #e74c3c; color: white; padding: 14px 28px; border-radius: 12px; font-weight: 900; font-size: 13px; border: none; cursor: pointer; }
+
+        /* HERO BANNER */
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(25, 21, 16, 0.85) 0%, rgba(12, 10, 8, 0.9) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 50px 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .hero-subtitle { font-size: 12px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 15px; }
+        .hero-title { font-size: clamp(32px, 4vw, 54px); font-weight: 900; text-transform: uppercase; margin-bottom: 20px; line-height: 1.1; }
+        .hero-desc { font-size: 14px; color: #b0b0b0; max-width: 550px; line-height: 1.6; margin-bottom: 30px; }
+        .hero-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        .btn-primary { background: var(--gold); color: #0c0a08; padding: 14px 28px; border-radius: 12px; font-weight: 800; font-size: 13px; text-transform: uppercase; border: none; cursor: pointer; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 700; font-size: 13px; text-transform: uppercase; border: 1px solid rgba(255, 255, 255, 0.12); cursor: pointer; }
+        .btn-support-tech { background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); color: white; padding: 14px 24px; border-radius: 12px; font-weight: 800; font-size: 13px; text-transform: uppercase; border: none; cursor: pointer; }
+
+        /* СТАТИСТИКА БАР */
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .stat-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 20px; backdrop-filter: blur(10px); }
+        .stat-label { font-size: 11px; font-weight: 700; color: #7a7a7a; text-transform: uppercase; margin-bottom: 6px; }
+        .stat-value { font-size: 16px; font-weight: 800; color: white; }
+
+        /* КАРТКИ ВНИЗУ */
+        .cards-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        .info-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; padding: 25px; backdrop-filter: blur(10px); cursor: pointer; transition: 0.3s; }
+        .info-card:hover { border-color: rgba(243, 168, 46, 0.5); transform: translateY(-3px); }
+        .info-card h3 { font-size: 17px; font-weight: 800; text-transform: uppercase; margin-bottom: 8px; }
+        .info-card p { font-size: 13px; color: #9a9a9a; line-height: 1.5; }
+
+        /* МОДАЛЬНІ ВІКНА */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.82);
+            backdrop-filter: blur(8px);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: linear-gradient(135deg, #181512 0%, #0c0a08 100%);
+            border: 2px solid var(--gold);
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 780px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 0 30px rgba(243, 168, 46, 0.3);
+            animation: modalAppear 0.3s ease-out;
+        }
+
+        @keyframes modalAppear {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-close { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #888; font-size: 24px; cursor: pointer; }
+        .modal-close:hover { color: white; }
+
+        .modal-icon { font-size: 40px; color: var(--gold); margin-bottom: 15px; }
+        .modal-title { font-size: 22px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; color: white; }
+        .modal-text { font-size: 13px; color: #b5b5b5; line-height: 1.6; margin-bottom: 20px; text-align: left; }
+
+        /* СПИСОК ПРАВИЛ */
+        .rules-content-box {
+            max-height: 450px;
+            overflow-y: auto;
+            padding-right: 8px;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .rules-content-box::-webkit-scrollbar { width: 6px; }
+        .rules-content-box::-webkit-scrollbar-thumb { background: rgba(243, 168, 46, 0.4); border-radius: 4px; }
+
+        .rule-category {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(243, 168, 46, 0.15);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .rule-category h3 {
+            color: var(--gold-light);
+            font-size: 15px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            border-bottom: 1px solid rgba(243, 168, 46, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .rule-item { margin-bottom: 12px; font-size: 12px; color: #dcdcdc; line-height: 1.5; }
+        .punishment { color: #e74c3c; font-weight: 700; }
+
+        .candidate-select-list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; margin-top: 15px; }
+        .candidate-item-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(243, 168, 46, 0.2);
+            border-radius: 12px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .candidate-item-btn:hover { background: rgba(243, 168, 46, 0.15); border-color: var(--gold); }
+
+        .admin-cards-list { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; }
+        .admin-card-item { background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 14px; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+
+        .requisites-box { background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(243, 168, 46, 0.4); border-radius: 14px; padding: 15px; margin-bottom: 20px; }
+        .requisites-label { font-size: 11px; font-weight: 700; color: var(--gold); text-transform: uppercase; margin-bottom: 5px; }
+        .requisites-number { font-size: 18px; font-weight: 800; color: white; }
+        .btn-copy { background: var(--gold); color: #0c0a08; width: 100%; padding: 12px; border-radius: 10px; font-weight: 800; font-size: 12px; text-transform: uppercase; border: none; cursor: pointer; }
+        .server-link-btn { display: inline-block; background: var(--gold); color: #0c0a08; padding: 12px 24px; border-radius: 10px; font-weight: 800; font-size: 12px; text-transform: uppercase; text-decoration: none; margin-bottom: 15px; }
+        .instruction-box { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px 15px; margin-bottom: 15px; text-align: left; font-size: 12px; color: #d0d0d0; }
+        .faction-info-text { background: rgba(243, 168, 46, 0.08); border: 1px dashed rgba(243, 168, 46, 0.3); border-radius: 14px; padding: 14px 18px; font-size: 13px; margin-bottom: 20px; }
+        .btn-hierarchy { background: linear-gradient(135deg, #f3a82e 0%, #d48312 100%); color: #0c0a08; padding: 12px 20px; border-radius: 10px; font-weight: 800; font-size: 12px; text-transform: uppercase; border: none; cursor: pointer; margin-bottom: 20px; }
+        .factions-scroll-list { display: flex; flex-direction: column; gap: 15px; max-height: 360px; overflow-y: auto; text-align: left; }
+        .faction-card-item { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 16px 20px; cursor: pointer; }
+        .faction-card-title { font-size: 15px; font-weight: 800; color: var(--gold-light); display: flex; align-items: center; gap: 10px; }
+        .faction-card-desc { font-size: 12px; color: #b0b0b0; margin-top: 5px; }
+        .leader-card-box { background: rgba(0, 0, 0, 0.6); border: 1px solid var(--gold); border-radius: 16px; padding: 25px; text-align: center; margin-bottom: 20px; }
+        .leader-avatar-icon { font-size: 48px; color: var(--gold-light); margin-bottom: 12px; }
+        .leader-nick-title { font-size: 18px; font-weight: 800; color: white; }
+        .leader-discord-tag { background: rgba(88, 101, 242, 0.15); border: 1px solid rgba(88, 101, 242, 0.4); color: #5865F2; padding: 8px 16px; border-radius: 10px; font-weight: 700; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; }
+        .btn-back-factions { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: white; padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 12px; text-transform: uppercase; cursor: pointer; }
+        .hierarchy-list { display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: 20px; }
+        .hierarchy-item { background: rgba(0,0,0,0.4); border-left: 3px solid var(--gold); border-radius: 8px; padding: 12px 16px; }
+        .hierarchy-rank { font-size: 11px; color: var(--gold); font-weight: 800; text-transform: uppercase; }
+        .hierarchy-name { font-size: 14px; font-weight: 700; color: white; margin-top: 2px; }
+
+        @media (max-width: 950px) {
+            .main-wrapper { grid-template-columns: 1fr; }
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-scene"></div>
+    <div class="gradient-mask"></div>
+
+   <div id="interview-lock-screen">
+        <div class="lock-icon-box"><i class="fa-solid fa-user-lock"></i></div>
+        <div class="lock-title" id="lock-screen-title">Тимчасовий обмежений доступ</div>
+        <div class="lock-desc" id="lock-screen-desc">Для вас сайт тимчасово недоступний до закінчення обзвону.<br>Будь ласка, зачекайте завершення процедури адміністратором.</div>
+        <button id="btn-dismiss-lock" class="btn-auth-main" style="display: none; max-width: 320px;" onclick="dismissLockScreen()">Закрити та повернутися до сайту</button>
+    </div>
+
+    <!-- ЕКРАН АВТОРИЗАЦІЇ -->
+    <div id="auth-screen">
+        <div class="auth-container">
+            <div class="auth-logo">Elite RP</div>
+            
+            <div id="login-form">
+                <div class="auth-input-group">
+                    <label>Нікнейм</label>
+                    <input type="text" id="login-nick" class="auth-input" placeholder="Введіть нікнейм">
+                </div>
+                <div class="auth-input-group">
+                    <label>Пароль</label>
+                    <input type="password" id="login-pass" class="auth-input" placeholder="Введіть пароль">
+                </div>
+                <button class="btn-auth-main" onclick="handleLogin()">Увійти</button>
+                <button class="btn-auth-switch" onclick="switchAuthMode('reg')">Зареєструватися</button>
+            </div>
+
+            <div id="reg-form" style="display: none;">
+                <div class="auth-input-group">
+                    <label>Нікнейм</label>
+                    <input type="text" id="reg-nick" class="auth-input" placeholder="Придумайте нікнейм">
+                </div>
+                <div class="auth-input-group">
+                    <label>Пароль</label>
+                    <input type="password" id="reg-pass1" class="auth-input" placeholder="Пароль">
+                </div>
+                <div class="auth-input-group">
+                    <label>Повторіть пароль</label>
+                    <input type="password" id="reg-pass2" class="auth-input" placeholder="Повторіть пароль">
+                </div>
+                <div class="auth-input-group">
+                    <label>Вік</label>
+                    <input type="number" id="reg-age" class="auth-input" placeholder="Введіть ваш вік">
+                </div>
+                <button class="btn-auth-main" onclick="handleRegister()">Зареєструватись</button>
+                <button class="btn-auth-switch" onclick="switchAuthMode('login')">Назад до входу</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ХЕДЕР -->
+    <header>
+        <div class="logo-container" onclick="location.reload()">
+            <span class="header-logo-text">ELITE RP</span>
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="active">Головна</a>
+            <a href="#" onclick="openRulesModal(); return false;">Правила</a>
+            <a href="#" onclick="openFactionsModal(); return false;">Фракції</a>
+            <a href="#" onclick="openHighAdminModal(); return false;">Верховна Адміністрація</a>
+        </nav>
+        <div class="user-profile-badge" onclick="logoutUser()" title="Натисніть, щоб вийти">
+            <img src="https://i.postimg.cc/hPG3FjBV/50f72c47-ae9d-4cad-a659-19acf923f8d5.png" class="user-avatar-small" id="header-user-ava">
+            <span id="header-username" style="font-size: 12px; font-weight: 700;">Гравець</span>
+            <div id="header-roles-box" style="display: inline-block;"></div>
+        </div>
+    </header>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+        
+        <div class="content-area">
+            
+            <!-- ГОЛОВНИЙ БАНЕР -->
+            <section class="hero-banner">
+                <div class="hero-subtitle">Roblox Roleplay</div>
+                <h1 class="hero-title"><span style="color:var(--gold);">Elite</span> RP</h1>
+                <p class="hero-desc">Реалістичне рольове місто: поліція, медики, цивільні та кримінал. Обирай фракцію, дотримуйся правил і створюй свою історію.</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="openServerModal()">На сервер</button>
+                    <button class="btn-secondary" onclick="openFactionsModal()"><i class="fa-solid fa-users-gear"></i> Обрати фракцію</button>
+                    <button class="btn-support-tech" onclick="openSupportModal()"><i class="fa-solid fa-heart"></i> Підтримати тех. адміна</button>
+                </div>
+
+                <!-- КНОПКА ВИДАЧІ ПОСАДИ (ВИДИМА ЛИШЕ ДЛЯ ТЕХ. АДМІНІСТРАТОРА) -->
+                <button class="btn-give-role-panel" id="btn-give-role-main" onclick="openManageRolesModal()">
+                    <i class="fa-solid fa-user-gear"></i> Видача посади
+                </button>
+
+                <!-- ДИНАМІЧНИЙ БЛОК ОБЗВОНУ -->
+                <div id="interview-control-area" style="display: none; margin-top: 15px;">
+                    <div id="interview-start-btn-box" class="interview-control-box">
+                        <div style="text-align: left;">
+                            <div style="font-size: 14px; font-weight: 800; color: white;">Панель проведення обзвонів</div>
+                            <div style="font-size: 12px; color: #aaa;">Розпочніть обзвон кандидата з автоматичним блокуванням та генератором тестів</div>
+                        </div>
+                        <button class="btn-interview-start" onclick="openSelectCandidateModal()">
+                            <i class="fa-solid fa-headset"></i> Провести обзвон
+                        </button>
+                    </div>
+
+                    <div id="interview-active-box" class="interview-active-screen" style="display: none;">
+                        <div class="interview-top-row">
+                            <div class="interview-candidate-profile">
+                                <img src="https://i.postimg.cc/hPG3FjBV/50f72c47-ae9d-4cad-a659-19acf923f8d5.png" class="interview-cand-ava" id="active-cand-ava">
+                                <div class="interview-cand-details">
+                                    <div style="font-size: 11px; color: #ff7700; font-weight: 800; text-transform: uppercase;">Кандидат на обзвоні</div>
+                                    <div class="interview-cand-nick" id="active-candidate-nick">Кандидат</div>
+                                    <div id="active-cand-roles-box" style="display: flex; gap: 4px;"></div>
+                                </div>
+                            </div>
+                            <div class="interview-timer-box" id="interview-timer">00:00</div>
+                        </div>
+                        <div class="interview-actions-row">
+                            <button class="btn-gen-questions" onclick="openTestGeneratorModal()">
+                                <i class="fa-solid fa-file-lines"></i> Згенерувати питання
+                            </button>
+                            <button class="btn-finish-interview-final" onclick="openResultChoiceModal()">
+                                <i class="fa-solid fa-flag-checkered"></i> Завершити обзвон
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- СТАТИСТИКА БАР -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-label">Нікнейм</div>
+                    <div class="stat-value" id="stat-nick">---</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">RP-ім'я</div>
+                    <div class="stat-value">123123</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ліцензія на зброю</div>
+                    <div class="stat-value">немає</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Водійські права</div>
+                    <div class="stat-value">немає</div>
+                </div>
+            </div>
+
+            <!-- КАРТКИ ВНИЗУ -->
+            <div class="cards-grid">
+                <div class="info-card" onclick="openRulesModal()">
+                    <h3>Правила проєкту</h3>
+                    <p>Правила адміністрації, ігрові терміни, статути, ПДР, КК та АК.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ПРАВА ЧАСТИНА: БОКОВИЙ БЛОК ONLINE -->
+        <aside class="sidebar-online-card">
+            <div class="sidebar-title">
+                <i class="fa-solid fa-circle" style="color: #2ecc71; font-size: 10px;"></i> Зараз на сайті
+            </div>
+            <div class="online-users-list" id="online-users-container"></div>
+        </aside>
+
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО КЕРУВАННЯ РОЛЯМИ (ВИДАЧА ПОСАДИ) -->
+    <div id="manageRolesModal" class="modal-overlay" onclick="closeManageRolesModalOutside(event)">
+        <div class="modal-box" style="max-width: 800px;">
+            <button class="modal-close" onclick="closeManageRolesModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-user-shield"></i></div>
+            <div class="modal-title">Панель видачі посад та ролей</div>
+            <p class="modal-text" style="text-align: center;">Обирайте або знімайте ролі для користувачів нижче. Зміни зберігаються миттєво:</p>
+            
+            <div class="rules-content-box" id="manage-users-list-container" style="max-height: 420px; text-align: left;"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ГЕНЕРАТОРА ПИТАНЬ -->
+    <div id="testGeneratorModal" class="modal-overlay" onclick="closeTestGeneratorModalOutside(event)">
+        <div class="modal-box" style="max-width: 850px;">
+            <button class="modal-close" onclick="closeTestGeneratorModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-list-check"></i></div>
+            <div class="modal-title">Тестування кандидата (20 рандомних правил)</div>
+            <p class="modal-text" style="text-align: center;">Позначте галочками питання, на які кандидат відповів правильно.</p>
+            
+            <div class="rules-content-box" id="test-questions-list-container" style="max-height: 400px; text-align: left;"></div>
+
+            <button class="btn-auth-main" style="margin-top: 15px;" onclick="calculateTestResults()">
+                <i class="fa-solid fa-calculator"></i> Завершити опитування та порахувати бали
+            </button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО РЕЗУЛЬТАТУ ТЕСТУВАННЯ -->
+    <div id="testResultModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 500px;">
+            <div class="modal-icon"><i class="fa-solid fa-award"></i></div>
+            <div class="modal-title">Результати опитування</div>
+            <div id="test-result-stats-text" style="font-size: 16px; font-weight: 800; color: white; margin-bottom: 15px;"></div>
+            <div id="test-result-recommendation" style="font-size: 14px; color: var(--gold-light); line-height: 1.5; margin-bottom: 25px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px;"></div>
+            <button class="btn-auth-main" onclick="closeTestResultModal()">Зрозуміло</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ВИБОРУ ФІНАЛЬНОГО ВЕРДИКТУ ОБЗВОНУ -->
+    <div id="resultChoiceModal" class="modal-overlay" onclick="closeResultChoiceModalOutside(event)">
+        <div class="modal-box" style="max-width: 500px;">
+            <button class="modal-close" onclick="closeResultChoiceModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-id-card"></i></div>
+            <div class="modal-title">Вердикт обзвону</div>
+            <p class="modal-text" style="text-align: center;">Оберіть результат проходження обзвону для кандидата:</p>
+            
+            <div class="interview-result-choice-box">
+                <button class="btn-result-passed" onclick="setInterviewVerdict('passed')">Пройдено</button>
+                <button class="btn-result-failed" onclick="setInterviewVerdict('failed')">Не пройдено</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ВЕРХОВНОЇ АДМІНІСТРАЦІЇ -->
+    <div id="highAdminModal" class="modal-overlay" onclick="closeHighAdminModalOutside(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeHighAdminModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-crown"></i></div>
+            <div class="modal-title">Верховна Адміністрація</div>
+            <div class="admin-cards-list" id="high-admins-container"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ВИБОРУ КАНДИДАТА НА ОБЗВОН -->
+    <div id="selectCandidateModal" class="modal-overlay" onclick="closeSelectCandidateModalOutside(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeSelectCandidateModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-user-plus"></i></div>
+            <div class="modal-title">Оберіть кандидата</div>
+            <p class="modal-text" style="text-align: center;">Натисніть на акаунт користувача, якому бажаєте розпочати обзвон:</p>
+            <div class="candidate-select-list" id="candidates-container"></div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ПРАВИЛ (ПОВНЕ) -->
+    <div id="rulesModal" class="modal-overlay" onclick="closeRulesModalOutside(event)">
+        <div class="modal-box" style="max-width: 780px;">
+            <button class="modal-close" onclick="closeRulesModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-book-open"></i></div>
+            <div class="modal-title">Повний звід правил та законів сервера</div>
+            
+            <div class="rules-content-box">
+                <div class="rule-category">
+                    <h3>1. Правила та регламент адміністрації</h3>
+                    <div class="rule-item">
+                        <b>1.1. Статус адміністратора:</b> Адміністратор — ООС (Out Of Character) представник проєкту, який відповідає за дотримання правил сервера, допомогу гравцям, розгляд скарг та підтримання порядку. Адміністратор не є звичайним гравцем із привілеями. Усі його дії повинні бути об’єктивними, зрозумілими та спрямованими на розвиток проєкту.<br>
+                        <b>Режими:</b> 1. Адмін-режим (розглядає репорти, стежить за порушеннями, допомагає гравцям, використовує адмін-команди виключно у службових цілях). 2. Ігровий режим (грає як звичайний гравець).<br>
+                        <b>Забороняється в ігровому режимі:</b> використовувати адмін-команди для отримання переваги; використовувати службову інформацію; використовувати функції Fly, NoClip, Teleport, Watch, Spectate, Broadcast, Vanish, Admin Transport та інші адміністративні можливості в особистих цілях; втручатися в RP-ситуації без необхідності. Адміністратору заборонено змішувати ігровий та адміністративний режими.<br>
+                        <span class="punishment">Внутрішнє покарання: догана / сувора догана / зняття з посади.</span>
+                    </div>
+                    <div class="rule-item">
+                        <b>1.2. Основні обов’язки адміністратора:</b> Адміністратор зобов’язаний дотримуватися правил проєкту, бути ввічливим із гравцями, своєчасно відповідати на репорти, видавати покарання лише відповідно до правил проєкту, зберігати нейтралітет, поважати керівництво та адміністрацію.<br>
+                        <span class="punishment">Внутрішнє покарання: догана.</span>
+                    </div>
+                    <div class="rule-item">
+                        <b>1.3. Адміністратору забороняється:</b> зловживати службовими повноваженнями; видавати покарання без причини; видавати або знімати покарання знайомим без належних підстав; передавати службову інформацію; ображати гравців; ігнорувати репорти; писати в тему не по темі.<br>
+                        <i>Окремий пункт:</i> адміністратор якщо в правилах немає такого правила може сам видати покарання.<br>
+                        <span class="punishment">Внутрішнє покарання: сувора догана / зняття з посади.</span>
+                    </div>
+                </div>
+
+                <div class="rule-category">
+                    <h3>2. Базові RolePlay терміни та ігрова валюта</h3>
+                    <div class="rule-item"><b>Ігрова валюта:</b> RP Валюта — Українська Гривня (₴): Оскільки сервер відтворює український сетинг, уся візуальна та системна валюта євро (€), що відображається в інтерфейсі гри, у RP-процесі, кодексах та діалогах прирівнюється і вважається Українською Гривнею (₴).</div>
+                    <div class="rule-item"><b>NonRP (Non-Roleplay):</b> Порушення логіки RolePlay-гри. Дії всупереч здоровому глузду чи физиці реального світу (стрільба зі стрибками). <span class="punishment">Покарання: Попередження або Kick.</span></div>
+                    <div class="rule-item"><b>RDM (Random Deathmatch):</b> Завдання шкоди або вбивство без RP-причини та активної RP-ситуації. <span class="punishment">Покарання: Бан від 1 до 3 днів.</span></div>
+                    <div class="rule-item"><b>VDM (Vehicle Deathmatch):</b> Навмисне збивання, наїзд на гравців або умисний таран чужих авто без RP-причини. <span class="punishment">Покарання: Попередження або Kick.</span></div>
+                    <div class="rule-item"><b>MG (Metagaming):</b> Використання інформації з OOC-джерел (стріми, чати, Discord) у RP-процесі. <span class="punishment">Покарання: Попередження або Kick.</span></div>
+                    <div class="rule-item"><b>PG (Powergaming):</b> Перебільшення можливостей свого персонажа (напад з кулаками на озброєну людину). <span class="punishment">Покарання: Бан від 1 до 3 днів.</span></div>
+                    <div class="rule-item"><b>FearRP:</b> Обов'язок відігравати страх за життя, якщо націлена зброя або є чисельна перевага. <span class="punishment">Покарання: Бан від 1 до 3 днів.</span></div>
+                    <div class="rule-item"><b>TWD (Talking While Downed):</b> Розмови у тяжкопораненому стані («в ноку»). Мертві не розмовляють! <span class="punishment">Покарання: Попередження.</span></div>
+                    <div class="rule-item"><b>Cuff Rush:</b> Заборонено миттєво та без RP-причини надягати кайданки (тільки після фіксації порушення згідно з КК та попередження). <span class="punishment">Покарання: Бан 1 день.</span></div>
+                    <div class="rule-item"><b>Cuff Rush + Auto Jail:</b> Миттєве заковування та одразу відправка до в'язниці без суду. <span class="punishment">Покарання: Бан 2 дні.</span></div>
+                    <div class="rule-item"><b>NonRP Cop:</b> Порушення працівником поліції правил сервера та ПК. <span class="punishment">Покарання: Попередження.</span></div>
+                    <div class="rule-item"><b>Ухід від RP:</b> Навмисний вихід із гри або перехід у AFK під час затримання чи перестрілки. <span class="punishment">Покарання: Бан 7 днів.</span></div>
+                    <div class="rule-item"><b>NLR (Правило нового життя):</b> Після смерті повністю забуваються обставини; заборонено повертатися на місце загибелі 10 хвилин. <span class="punishment">Покарання: Попередження або Kick.</span></div>
+                    <div class="rule-item"><b>GTA Driving (NRD):</b> Нереалістична їзда, постійні навмисні тарани, їзда на спорткарах по горах та полях. <span class="punishment">Покарання: Попередження або Kick.</span></div>
+                    <div class="rule-item"><b>Абуз скутера під час розшуку:</b> Використання скутера для втечі від поліції. <span class="punishment">Покарання: Попередження або Kick.</span></div>
+                </div>
+
+                <div class="rule-category">
+                    <h3>3. Статут та правила Національної поліції</h3>
+                    <div class="rule-item"><b>ПОЛ-101 (Статус поліції):</b> Державна RP-фракція для порядку в місті, затримань та охорони громадян. <span class="punishment">Покарання: догана.</span></div>
+                    <div class="rule-item"><b>ПОЛ-102 (Підрозділи):</b> Патрульна служба, Дорожня поліція, КОРД. Кожен робить свою роботу. <span class="punishment">Покарання: догана.</span></div>
+                    <div class="rule-item"><b>ПОЛ-203 & 204 (Заборони):</b> Заборонено NonRP Cop, використання посади заради особистої вигоди чи помсти. <span class="punishment">Покарання: звільнення.</span></div>
+                    <div class="rule-item"><b>ПОЛ-301 & 302 (Транспорт):</b> Службове авто тільки для роботи; заборонено використовувати для перегонів чи розваг. <span class="punishment">Покарання: догана.</span></div>
+                    <div class="rule-item"><b>ПОЛ-401 & 404 (Сила):</b> Зброя та силове затримання (Cuff Rush) без причини заборонені. <span class="punishment">Покарання: звільнення.</span></div>
+                </div>
+
+                <div class="rule-category">
+                    <h3>4. Правила дорожнього руху (ПДР)</h3>
+                    <div class="rule-item">
+                        • 1.1 Проїзд на червоне світло — Штраф: 2000 ₴<br>
+                        • 1.2 Ігнорування дорожніх знаків — Штраф: 1250 ₴<br>
+                        • 1.3 Перевищення швидкості — Штраф: 2000 ₴<br>
+                        • 1.4 Їзда по зустрічній смузі без RP-причини — Штраф: 2500 ₴<br>
+                        • 1.5 Небезпечні маневри між смугами — Штраф: 2000 ₴<br>
+                        • 1.6 Створення ДТП з виною гравця — Штраф: 4000 ₴<br>
+                        • 1.7 Втеча з місця ДТП — Штраф: 7000 ₴<br>
+                        • 1.8 Паркування у забороненому місці (парковки держустанов, зупинки, тротуари, мости, клумби, посеред дороги) — Штраф: 1000 ₴<br>
+                        • 1.9 Ігнорування вимоги поліції зупинитися — Штраф: 3500 ₴<br>
+                        • 1.10 Невикористання поворотника / різка зміна смуги — Штраф: 1500 ₴<br>
+                        • 1.12 Використання аварійки без причини — Штраф: 2225 ₴<br>
+                        • 1.13 Рух без фар з 18:00 до 7:00 або при поганій видимості (туман, дощ, сніг) — Штраф: 2300 ₴<br>
+                        • 1.14 Рух у темний час доби лише з габаритами — Штраф: 1500 ₴<br>
+                        • 1.15 Намірне вимкнення світла для уникнення погоні — Штраф: 2500 ₴<br>
+                        • 1.16 Неуступання дороги службовим машинам — Штраф: 2000 ₴<br>
+                        • 1.17 Поворот не з тої смуги — Штраф: 1000 ₴<br>
+                        • 1.18 Рух з пробитим колесом тільки до 30 км/год і на аварійках — Штраф: 2000 ₴
+                    </div>
+                </div>
+
+                <div class="rule-category">
+                    <h3>5. Кримінальний кодекс (КК)</h3>
+                    <div class="rule-item"><b>КК-101 — КК-104 (Пограбування):</b> Пограбування Головного Банку, Ювелірного магазину, каси або злам автоматів. Наслідок: штурм спецпідрозділу СБУ-КОРД, затримання та передача справи до суду.</div>
+                    <div class="rule-item"><b>КК-201 (Відкрита зброя):</b> Носіння зброї в руках у місті без прямої загрози. <span class="punishment">Покарання: силовий арешт, вилучення зброї та суд.</span></div>
+                    <div class="rule-item"><b>КК-202 — КК-206:</b> Посягання на життя держслужбовців (вогонь у відповідь), захоплення заручників, втеча від поліції, пошкодження майна.</div>
+                </div>
+
+                <div class="rule-category">
+                    <h3>6. Адміністративний кодекс (АК) — тільки штрафи</h3>
+                    <div class="rule-item"><b>АК-101 (Хуліганство):</b> Образи, крики, колонки з музикою в громадських місцях, стрибки по авто. Штраф до 2000 ₴.</div>
+                    <div class="rule-item"><b>АК-102 (Хибний виклик):</b> Виклик поліції/медиків без причини. Штраф 3000 ₴.</div>
+                    <div class="rule-item"><b>АК-201 (Непокора поліції):</b> Відмова показати документи або вийти з авто. Штраф до 4000 ₴. *(Пам'ятка: при повторному порушенні через ліміт переказів викликається інший офіцер).*</div>
+                    <div class="rule-item"><b>АК-202 & 203:</b> Проникнення на закриту територію (парковка поліції, база СБУ-КОРД) та перешкоджання роботі екстрених служ. Штраф 2500–3000 ₴.</div>
+                    <div class="rule-item"><b>АК-203 (Переслідування):</b> Переслідування гравця заборонено (порушення права на приватність).</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ПІДТРИМКИ -->
+    <div id="supportModal" class="modal-overlay" onclick="closeSupportModalOutside(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeSupportModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div class="modal-title">Підтримка тех. адміністратора</div>
+            <p class="modal-text" style="text-align: center;">Підтримайте нашого тех. адміна <b>Moore</b>:</p>
+            <div class="requisites-box">
+                <div class="requisites-label">Monobank</div>
+                <div class="requisites-number" id="cardNumber">4874 0700 2007 2490</div>
+            </div>
+            <button class="btn-copy" onclick="copyCardNumber()">Скопіювати реквізити</button>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО «НА СЕРВЕР» (ПОВНИЙ ТЕКСТ ТА ІНСТРУКЦІЯ) -->
+    <div id="serverModal" class="modal-overlay" onclick="closeServerModalOutside(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeServerModal()">&times;</button>
+            <div class="modal-icon"><i class="fa-solid fa-gamepad"></i></div>
+            <div class="modal-title">Підключення до сервера</div>
+            <p class="modal-text" style="text-align: center; margin-bottom: 12px;">Вітаємо! Дякуємо, що вирішили зайти на сервер. Для входу на сервер перейдіть, натиснувши кнопку нижче:</p>
+            
+            <div style="text-align: center; margin-bottom: 15px;">
+                <a href="https://www.roblox.com/share?v=v2&code=5ihdm3h6ieiniy" target="_blank" class="server-link-btn">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> На сервер
+                </a>
+            </div>
+
+            <div class="instruction-box">
+                <b>Якщо не вдається зайти на сервер:</b><br>
+                Зайдіть у <b>ROBLOX</b>, у пошуку напишіть <b>Emergency Hamburg</b>. У грі відкрийте телефон, виберіть вкладку сервера, потім <b>Join to server by code</b> і введіть код: <b style="color: var(--gold-light); font-size: 13px;">pv6ccs55</b>
+            </div>
+
+            <div class="footer-greeting" style="font-size: 13px; color: var(--gold);">Приємної гри на Elite RP</div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ФРАКЦІЙ (ПОВНЕ, З УСІМА КЕРІВНИКАМИ ТА ІЄРАРХІЄЮ) -->
+    <div id="factionsModal" class="modal-overlay" onclick="closeFactionsModalOutside(event)">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeFactionsModal()">&times;</button>
+            
+            <div id="factionListScreen">
+                <div class="modal-icon"><i class="fa-solid fa-sitemap"></i></div>
+                <div class="faction-info-text">Вітаю! Тут ви можете ознайомитись з усіма фракціями сервера та їхніми обов'язками.</div>
+                <button class="btn-hierarchy" onclick="showHierarchyScreen()"><i class="fa-solid fa-layer-group"></i> Ієрархія фракцій</button>
+
+                <div class="factions-scroll-list">
+                    <div class="faction-card-item" onclick="showLeaderInfo('Служба Безпеки України', 'cnfcsr35', 'hokahoka200_14973')">
+                        <div class="faction-card-title"><i class="fa-solid fa-shield"></i> Служба Безпеки України</div>
+                        <div class="faction-card-desc">Контррозвідка, боротьба з тероризмом, захист державної таємниці.</div>
+                    </div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Судова Влада', 'domytik', 'zeleboba3._80058')">
+                        <div class="faction-card-title"><i class="fa-solid fa-gavel"></i> Судова Влада</div>
+                        <div class="faction-card-desc">Здійснення правосуддя, розгляд справ, ордери.</div>
+                    </div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Державне Бюро Розслідувань', null, null)">
+                        <div class="faction-card-title"><i class="fa-solid fa-magnifying-glass-chart"></i> Державне Бюро Розслідувань</div>
+                        <div class="faction-card-desc">Розслідування посадових злочинів чиновників та правоохоронців.</div>
+                    </div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Збройні Сили України', 'domytik', 'zeleboba3._80058')">
+                        <div class="faction-card-title"><i class="fa-solid fa-person-rifle"></i> Збройні Сили України</div>
+                        <div class="faction-card-desc">Охорона суверенітету та захист кордонів.</div>
+                    </div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Національна Поліція України', 'domytik', 'zeleboba3._80058')">
+                        <div class="faction-card-title"><i class="fa-solid fa-user-shield"></i> Національна Поліція України</div>
+                        <div class="faction-card-desc">Забезпечення громадського порядку та патрулювання.</div>
+                    </div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Спецпідрозділ КОРД', 'gorodok2001', 'gorodok2002')">
+                        <div class="faction-card-title"><i class="fa-solid fa-mask-skull"></i> Спецпідрозділ КОРД</div>
+                        <div class="faction-card-desc">Штурмові операції та затримання особливо небезпечних.</div>
+                    </div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Державна Служба Надзвичайних Ситуацій', null, null)">
+                        <div class="faction-card-title"><i class="fa-solid fa-fire-extinguisher"></i> ДСНС України</div>
+                        <div class="faction-card-desc">Ліквідація пожеж та рятувальні роботи.</div>
+                    </div>
+                    <div class="faction-card-item" onclick="showLeaderInfo('Міністерство Охорони Здоров\'я', null, null)">
+                        <div class="faction-card-title"><i class="fa-solid fa-notes-medical"></i> Міністерство Охорони Здоров'я</div>
+                        <div class="faction-card-desc">Медична допомога та лікування громадян.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="factionLeaderScreen" style="display: none;">
+                <div class="modal-title" id="displayFactionName" style="font-size: 18px; color: var(--gold-light); margin-bottom: 20px;"></div>
+                <div class="leader-card-box" id="leaderDetailBox"></div>
+                <button class="btn-back-factions" onclick="backToFactionsList()"><i class="fa-solid fa-arrow-left"></i> Назад до фракцій</button>
+            </div>
+
+            <div id="hierarchyScreen" style="display: none;">
+                <div class="modal-title" style="font-size: 18px; color: var(--gold-light); margin-bottom: 15px;">Ієрархія державних структур</div>
+                <div class="hierarchy-list">
+                    <div class="hierarchy-item"><div class="hierarchy-rank">1 Ранг</div><div class="hierarchy-name">Судова Влада</div></div>
+                    <div class="hierarchy-item"><div class="hierarchy-rank">2 Ранг</div><div class="hierarchy-name">СБУ / ДБР</div></div>
+                    <div class="hierarchy-item"><div class="hierarchy-rank">3 Ранг</div><div class="hierarchy-name">Збройні Сили України</div></div>
+                    <div class="hierarchy-item"><div class="hierarchy-rank">4 Ранг</div><div class="hierarchy-name">НПУ (включно з КОРД)</div></div>
+                    <div class="hierarchy-item"><div class="hierarchy-rank">5 Ранг</div><div class="hierarchy-name">ДСНС / МОЗ</div></div>
+                </div>
+                <button class="btn-back-factions" onclick="backToFactionsList()"><i class="fa-solid fa-arrow-left"></i> Назад</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE ТА ПОВНА ЛОГІКА -->
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+        import { getDatabase, ref, get, set, child, onValue, remove } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjpHL-aaOQPZGK1CQHlrKvhEtOrYrsbvI",
+            authDomain: "ancets-b3aa7.firebaseapp.com",
+            projectId: "ancets-b3aa7",
+            storageBucket: "ancets-b3aa7.firebasestorage.app",
+            messagingSenderId: "450945374380",
+            appId: "1:450945374380:web:12cf39687a02eb0e24e709",
+            databaseURL: "https://ancets-b3aa7-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const DEFAULT_AVATAR = "https://i.postimg.cc/hPG3FjBV/50f72c47-ae9d-4cad-a659-19acf923f8d5.png";
+
+        const ROLE_MAP = {
+            player: { l: "Player", c: "role-player", icon: "🎮" },
+            trainee: { l: "Trainee", c: "role-trainee", icon: "🌱" },
+            junioradmin: { l: "Junior Admin", c: "role-junioradmin", icon: "⭐" },
+            admin: { l: "Admin", c: "role-admin", icon: "🛡️" },
+            senioradmin: { l: "Senior Admin", c: "role-senioradmin", icon: "💫" },
+            headadmin: { l: "Head Admin", c: "role-headadmin", icon: "👑" },
+            deputyheadadmin: { l: "Deputy Head Admin", c: "role-deputyheadadmin", icon: "⚡" },
+            deputyowner: { l: "Deputy Owner", c: "role-deputyowner", icon: "💎" },
+            techadmin: { l: "Tech Admin", c: "role-techadmin", icon: "🔧" },
+            owner: { l: "Owner", c: "role-owner", icon: "🌟" }
+        };
+
+        const ALL_POSSIBLE_QUESTIONS = [
+            { text: "Що таке NonRP (Non-Roleplay)?", score: 0.5 },
+            { text: "Яке покарання за RDM (Random Deathmatch)?", score: 1.0 },
+            { text: "Що означає абревіатура MG (Metagaming)?", score: 0.5 },
+            { text: "Які правила діють при втечі від поліції на скутері?", score: 1.0 },
+            { text: "Що таке FearRP та який обов'язок він накладає?", score: 1.5 },
+            { text: "Назвіть покарання за навмисний вихід із гри під час RP", score: 2.0 },
+            { text: "Що таке правило NLR (Правило нового життя)?", score: 1.5 },
+            { text: "Чи дозволено розмовляти у тяжкопораненому стані (TWD)?", score: 0.5 },
+            { text: "Які особливості та регламент режиму адміністратора?", score: 2.0 },
+            { text: "Що заборонено адміністратору в ігровому режимі?", score: 1.5 },
+            { text: "Який штраф за проїзд на червоне світло згідно з ПДР?", score: 0.5 },
+            { text: "Який штраф за створення ДТП?", score: 1.0 },
+            { text: "Що загрожує за носіння відкритої зброї в місті (КК-201)?", score: 1.5 },
+            { text: "Який штраф за ігнорування вимоги поліції зупинитися?", score: 1.0 },
+            { text: "Які санкції за непокору поліції (АК-201)?", score: 1.0 },
+            { text: "Що таке Cuff Rush та яке покарання за нього?", score: 1.5 },
+            { text: "Яка валюта прирівнюється у RP до гривень (₴)?", score: 0.5 },
+            { text: "Що заборонено поліції згідно зі статутом (ПОЛ-203)?", score: 1.5 },
+            { text: "Які санкції за неправильне паркування?", score: 0.5 },
+            { text: "Яке покарання за VDM?", score: 1.0 }
+        ];
+
+        let currentUserNick = localStorage.getItem('elite_rp_user');
+        let interviewTimerInterval = null;
+        let interviewStartTime = 0;
+
+        if (currentUserNick) {
+            initSession(currentUserNick);
+        }
+
+        window.switchAuthMode = function(mode) {
+            document.getElementById('login-form').style.display = (mode === 'reg') ? 'none' : 'block';
+            document.getElementById('reg-form').style.display = (mode === 'reg') ? 'block' : 'none';
+        }
+
+        window.handleLogin = async function() {
+            const nick = document.getElementById('login-nick').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+            if (!nick || !pass) return alert("Заповніть всі поля!");
+
+            try {
+                const snapshot = await get(child(ref(db), `users/${nick}`));
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    if (userData.password === pass) {
+                        localStorage.setItem('elite_rp_user', nick);
+                        currentUserNick = nick;
+                        initSession(nick);
+                    } else {
+                        alert("Невірний пароль!");
+                    }
+                } else {
+                    alert("Акаунт не знайдено!");
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        window.handleRegister = async function() {
+            const nick = document.getElementById('reg-nick').value.trim();
+            const pass1 = document.getElementById('reg-pass1').value.trim();
+            const pass2 = document.getElementById('reg-pass2').value.trim();
+            const age = document.getElementById('reg-age').value.trim();
+
+            if (!nick || !pass1 || !pass2 || !age) return alert("Заповніть анкету!");
+            if (pass1 !== pass2) return alert("Паролі не співпадають!");
+
+            try {
+                const snapshot = await get(child(ref(db), `users/${nick}`));
+                if (snapshot.exists()) return alert("Нікнейм вже зайнятий!");
+
+                await set(ref(db, `users/${nick}`), {
+                    nickname: nick,
+                    password: pass1,
+                    age: age,
+                    roles: ['player'],
+                    interview_status: 'none'
+                });
+
+                alert("Реєстрація успішна!");
+                switchAuthMode('login');
+            } catch (e) { console.error(e); }
+        }
+
+        function initSession(nick) {
+            document.getElementById('auth-screen').style.display = 'none';
+            set(ref(db, `online/${nick}`), { nickname: nick, time: Date.now() });
+
+            // ОПТИМІЗОВАНИЙ СПИСОК ОНЛАЙН ГРАВЦІВ (БЕЗ ЛАГІВ)
+            onValue(ref(db, 'online'), async (snapshot) => {
+                const container = document.getElementById('online-users-container');
+                container.innerHTML = '';
+                if (snapshot.exists()) {
+                    const onlineData = snapshot.val();
+                    const usersSnap = await get(child(ref(db), 'users'));
+                    const allUsers = usersSnap.exists() ? usersSnap.val() : {};
+
+                    Object.keys(onlineData).forEach((userKey) => {
+                        const u = allUsers[userKey];
+                        if (u) {
+                            const roles = Array.isArray(u.roles) ? u.roles : ['player'];
+                            let rolesHtml = '';
+                            roles.forEach(r => {
+                                const rm = ROLE_MAP[r.toLowerCase().trim()] || ROLE_MAP['player'];
+                                rolesHtml += `<span class="role-badge ${rm.c}">${rm.icon} ${rm.l}</span>`;
+                            });
+
+                            const div = document.createElement('div');
+                            div.className = 'online-user-item';
+                            div.innerHTML = `
+                                <img src="${DEFAULT_AVATAR}" class="online-avatar">
+                                <div class="online-info">
+                                    <div class="online-nick">${u.nickname}</div>
+                                    <div>${rolesHtml}</div>
+                                </div>
+                            `;
+                            container.appendChild(div);
+                        }
+                    });
+                }
+            });
+
+            // Оновлення профілю та ролей поточного юзера
+            onValue(ref(db, `users/${nick}`), (snapshot) => {
+                if (snapshot.exists()) {
+                    const u = snapshot.val();
+                    document.getElementById('header-username').innerText = u.nickname;
+                    document.getElementById('stat-nick').innerText = u.nickname;
+
+                    const roles = Array.isArray(u.roles) ? u.roles : ['player'];
+                    let rolesHtml = '';
+                    let isTechAdmin = false;
+                    let isHighAdmin = false;
+
+                    roles.forEach(r => {
+                        const rKey = r.toLowerCase().trim();
+                        const rm = ROLE_MAP[rKey] || ROLE_MAP['player'];
+                        rolesHtml += `<span class="role-badge ${rm.c}">${rm.icon} ${rm.l}</span>`;
+                        if (rKey === 'techadmin') isTechAdmin = true;
+                        if (['deputyowner', 'techadmin', 'owner'].includes(rKey)) isHighAdmin = true;
+                    });
+
+                    document.getElementById('header-roles-box').innerHTML = rolesHtml;
+                    document.getElementById('btn-give-role-main').style.display = isTechAdmin ? 'inline-flex' : 'none';
+                    document.getElementById('interview-control-area').style.display = isHighAdmin ? 'block' : 'none';
+                }
+            });
+
+            // ГЛОБАЛЬНЕ БЛОКУВАННЯ САЙТУ ДЛЯ ГРАВЦІВ ПІД ЧАС ОБЗВОНУ
+            onValue(ref(db, 'active_interview'), async (snapshot) => {
+                const uSnap = await get(child(ref(db), `users/${nick}`));
+                if (!uSnap.exists()) return;
+                const uData = uSnap.val();
+                const roles = Array.isArray(uData.roles) ? uData.roles : ['player'];
+                const isPlayerOnly = roles.length === 1 && roles.includes('player');
+
+                const lockScreen = document.getElementById('interview-lock-screen');
+                const dismissBtn = document.getElementById('btn-dismiss-lock');
+
+                if (snapshot.exists()) {
+                    const intData = snapshot.val();
+                    
+                    if (isPlayerOnly) {
+                        lockScreen.style.display = 'flex';
+                        if(dismissBtn) dismissBtn.style.display = 'none';
+                        document.getElementById('lock-screen-title').innerText = "Сайт тимчасово заблоковано";
+                        document.getElementById('lock-screen-desc').innerText = "Сайт тимчасово заблоковано до завершення обзвону з метою збереження конфіденційності.";
+                        document.querySelector('.lock-icon-box').innerHTML = '<i class="fa-solid fa-user-lock" style="color:#ff3333;"></i>';
+                    }
+
+                    if (intData.interviewer === nick) {
+                        document.getElementById('interview-start-btn-box').style.display = 'none';
+                        document.getElementById('interview-active-box').style.display = 'flex';
+                        document.getElementById('active-candidate-nick').innerText = intData.candidate;
+
+                        const candSnap = await get(child(ref(db), `users/${intData.candidate}`));
+                        if (candSnap.exists()) {
+                            const candData = candSnap.val();
+                            const candRoles = Array.isArray(candData.roles) ? candData.roles : ['player'];
+                            let cRolesHtml = '';
+                            candRoles.forEach(r => {
+                                const rm = ROLE_MAP[r.toLowerCase()] || ROLE_MAP['player'];
+                                cRolesHtml += `<span class="role-badge ${rm.c}">${rm.icon} ${rm.l}</span>`;
+                            });
+                            document.getElementById('active-cand-roles-box').innerHTML = cRolesHtml;
+                        }
+
+                        if (!interviewTimerInterval) {
+                            interviewStartTime = intData.startTime;
+                            startTimerUI();
+                        }
+                    }
+                } else {
+                    if (interviewTimerInterval) {
+                        clearInterval(interviewTimerInterval);
+                        interviewTimerInterval = null;
+                    }
+                    document.getElementById('interview-start-btn-box').style.display = 'flex';
+                    document.getElementById('interview-active-box').style.display = 'none';
+
+                    if (isPlayerOnly) {
+                        lockScreen.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        window.openManageRolesModal = async function() {
+            const container = document.getElementById('manage-users-list-container');
+            container.innerHTML = '<div style="color:#aaa;">Завантаження користувачів...</div>';
+            document.getElementById('manageRolesModal').style.display = 'flex';
+
+            const snapshot = await get(child(ref(db), 'users'));
+            container.innerHTML = '';
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                Object.keys(users).forEach(uKey => {
+                    const u = users[uKey];
+                    const userRoles = Array.isArray(u.roles) ? u.roles : ['player'];
+
+                    const card = document.createElement('div');
+                    card.className = 'manage-user-card';
+                    
+                    let rolesButtonsHtml = '';
+                    Object.keys(ROLE_MAP).forEach(rKey => {
+                        const hasRole = userRoles.includes(rKey);
+                        rolesButtonsHtml += `<button class="role-toggle-btn ${hasRole ? 'active' : ''}" onclick="toggleUserRole('${uKey}', '${rKey}', this)">${ROLE_MAP[rKey].l}</button>`;
+                    });
+
+                    card.innerHTML = `
+                        <div style="font-weight: 800; font-size: 14px; color: var(--gold-light); margin-bottom: 6px;">${u.nickname}</div>
+                        <div style="font-size: 11px; color: #888;">Доступні ролі:</div>
+                        <div class="manage-roles-row">${rolesButtonsHtml}</div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+        }
+
+        window.toggleUserRole = async function(targetUser, roleKey, btnElement) {
+            const userRef = ref(db, `users/${targetUser}/roles`);
+            const snap = await get(userRef);
+            let roles = snap.exists() ? snap.val() : ['player'];
+            if (!Array.isArray(roles)) roles = [roles];
+
+            if (roles.includes(roleKey)) {
+                if (roles.length > 1) {
+                    roles = roles.filter(r => r !== roleKey);
+                    btnElement.classList.remove('active');
+                } else {
+                    alert("У користувача має залишитись хоча б одна роль!");
+                    return;
+                }
+            } else {
+                roles.push(roleKey);
+                btnElement.classList.add('active');
+            }
+
+            await set(userRef, roles);
+        }
+
+        window.closeManageRolesModal = function() { document.getElementById('manageRolesModal').style.display = 'none'; }
+        window.closeManageRolesModalOutside = function(e) { if (e.target.id === 'manageRolesModal') closeManageRolesModal(); }
+
+        window.openSelectCandidateModal = async function() {
+            const container = document.getElementById('candidates-container');
+            container.innerHTML = '<div style="color:#aaa;">Завантаження...</div>';
+            document.getElementById('selectCandidateModal').style.display = 'flex';
+
+            const snapshot = await get(child(ref(db), 'users'));
+            container.innerHTML = '';
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                Object.keys(users).forEach(uKey => {
+                    if (uKey !== currentUserNick) {
+                        const btn = document.createElement('div');
+                        btn.className = 'candidate-item-btn';
+                        btn.innerHTML = `<span><i class="fa-solid fa-user" style="color:var(--gold); margin-right:8px;"></i> ${uKey}</span> <i class="fa-solid fa-chevron-right" style="font-size:12px; color:#888;"></i>`;
+                        btn.onclick = () => startInterviewWith(uKey);
+                        container.appendChild(btn);
+                    }
+                });
+            }
+        }
+
+        window.startInterviewWith = async function(candidateNick) {
+            closeSelectCandidateModal();
+            await set(ref(db, `users/${candidateNick}/interview_status`), 'in_progress');
+            await set(ref(db, 'active_interview'), {
+                interviewer: currentUserNick,
+                candidate: candidateNick,
+                startTime: Date.now()
+            });
+        }
+
+        function startTimerUI() {
+            interviewTimerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - interviewStartTime) / 1000);
+                const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const s = String(elapsed % 60).padStart(2, '0');
+                document.getElementById('interview-timer').innerText = `${m}:${s}`;
+            }, 1000);
+        }
+
+        window.openTestGeneratorModal = function() {
+            const container = document.getElementById('test-questions-list-container');
+            container.innerHTML = '';
+            const shuffled = [...ALL_POSSIBLE_QUESTIONS].sort(() => 0.5 - Math.random());
+            shuffled.slice(0, 20).forEach((q, index) => {
+                const item = document.createElement('div');
+                item.className = 'test-question-item';
+                item.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                        <input type="checkbox" class="test-checkbox-input" data-score="${q.score}">
+                        <div class="test-question-text"><b>${index + 1}.</b> ${q.text}</div>
+                    </div>
+                    <div class="test-question-score-badge">+${q.score} бал.</div>
+                `;
+                container.appendChild(item);
+            });
+            document.getElementById('testGeneratorModal').style.display = 'flex';
+        }
+
+        window.calculateTestResults = function() {
+            const checkboxes = document.querySelectorAll('.test-checkbox-input');
+            let earned = 0, max = 0;
+            checkboxes.forEach(cb => {
+                const s = parseFloat(cb.getAttribute('data-score'));
+                max += s;
+                if (cb.checked) earned += s;
+            });
+            closeTestGeneratorModal();
+            const pct = (earned / max) * 100;
+            let rec = pct >= 75 ? "Чудові знання правил!" : pct >= 50 ? "Базові знання присутні." : "Слабкий результат.";
+            document.getElementById('test-result-stats-text').innerText = `Набрано: ${earned.toFixed(1)} з ${max.toFixed(1)} (${pct.toFixed(0)}%)`;
+            document.getElementById('test-result-recommendation').innerText = rec;
+            document.getElementById('testResultModal').style.display = 'flex';
+        }
+
+        window.closeTestResultModal = function() { document.getElementById('testResultModal').style.display = 'none'; }
+        window.openResultChoiceModal = function() { document.getElementById('resultChoiceModal').style.display = 'flex'; }
+        window.closeResultChoiceModal = function() { document.getElementById('resultChoiceModal').style.display = 'none'; }
+
+        window.setInterviewVerdict = async function(verdict) {
+            const intSnap = await get(child(ref(db), 'active_interview'));
+            if (intSnap.exists()) {
+                await remove(ref(db, 'active_interview'));
+                closeResultChoiceModal();
+                alert(`Обзвон завершено!`);
+            }
+        }
+
+        window.openHighAdminModal = async function() {
+            const container = document.getElementById('high-admins-container');
+            container.innerHTML = '<div style="color:#aaa;">Завантаження...</div>';
+            document.getElementById('highAdminModal').style.display = 'flex';
+
+            const snapshot = await get(child(ref(db), 'users'));
+            container.innerHTML = '';
+            if (snapshot.exists()) {
+                const users = snapshot.val();
+                Object.keys(users).forEach(uKey => {
+                    const u = users[uKey];
+                    const roles = Array.isArray(u.roles) ? u.roles : ['player'];
+                    let isHigh = false;
+                    let rolesHtml = '';
+
+                    roles.forEach(r => {
+                        const rKey = r.toLowerCase().trim();
+                        if (['headadmin', 'deputyheadadmin', 'senioradmin', 'admin', 'junioradmin', 'trainee', 'deputyowner', 'techadmin', 'owner'].includes(rKey)) isHigh = true;
+                        const rm = ROLE_MAP[rKey] || ROLE_MAP['player'];
+                        rolesHtml += `<span class="role-badge ${rm.c}">${rm.icon} ${rm.l}</span>`;
+                    });
+
+                    if (isHigh) {
+                        const card = document.createElement('div');
+                        card.className = 'admin-card-item';
+                        card.innerHTML = `
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <img src="${DEFAULT_AVATAR}" style="width:36px; height:36px; border-radius:50%; border:1px solid var(--gold);">
+                                <span style="font-weight:800; font-size:14px;">${u.nickname}</span>
+                            </div>
+                            <div>${rolesHtml}</div>
+                        `;
+                        container.appendChild(card);
+                    }
+                });
+            }
+        }
+
+        window.logoutUser = function() {
+            if (confirm("Бажаєте вийти з акаунта?")) {
+                if (currentUserNick) remove(ref(db, `online/${currentUserNick}`));
+                localStorage.removeItem('elite_rp_user');
+                location.reload();
+            }
+        }
+    </script>
+
+    <script>
+        window.dismissLockScreen = async function() {
+            document.getElementById('interview-lock-screen').style.display = 'none';
+        }
+        function openSupportModal() { document.getElementById('supportModal').style.display = 'flex'; }
+        function closeSupportModal() { document.getElementById('supportModal').style.display = 'none'; }
+        function closeSupportModalOutside(e) { if (e.target.id === 'supportModal') closeSupportModal(); }
+        
+        function copyCardNumber() { navigator.clipboard.writeText("4874070020072490").then(() => alert("Реквізити скопійовано!")); }
+
+        function openServerModal() { document.getElementById('serverModal').style.display = 'flex'; }
+        function closeServerModal() { document.getElementById('serverModal').style.display = 'none'; }
+        function closeServerModalOutside(e) { if (e.target.id === 'serverModal') closeServerModal(); }
+
+        function openRulesModal() { document.getElementById('rulesModal').style.display = 'flex'; }
+        function closeRulesModal() { document.getElementById('rulesModal').style.display = 'none'; }
+        function closeRulesModalOutside(e) { if (e.target.id === 'rulesModal') closeRulesModal(); }
+
+        function openFactionsModal() { backToFactionsList(); document.getElementById('factionsModal').style.display = 'flex'; }
+        function closeFactionsModal() { document.getElementById('factionsModal').style.display = 'none'; }
+        function closeFactionsModalOutside(e) { if (e.target.id === 'factionsModal') closeFactionsModal(); }
+
+        function closeSelectCandidateModal() { document.getElementById('selectCandidateModal').style.display = 'none'; }
+        function closeSelectCandidateModalOutside(e) { if (e.target.id === 'selectCandidateModal') closeSelectCandidateModal(); }
+
+        function closeHighAdminModal() { document.getElementById('highAdminModal').style.display = 'none'; }
+        function closeHighAdminModalOutside(e) { if (e.target.id === 'highAdminModal') closeHighAdminModal(); }
+
+        function closeTestGeneratorModal() { document.getElementById('testGeneratorModal').style.display = 'none'; }
+        function closeTestGeneratorModalOutside(e) { if (e.target.id === 'testGeneratorModal') closeTestGeneratorModal(); }
+
+        function showLeaderInfo(name, nick, dc) {
+            document.getElementById('factionListScreen').style.display = 'none';
+            document.getElementById('hierarchyScreen').style.display = 'none';
+            document.getElementById('factionLeaderScreen').style.display = 'block';
+            document.getElementById('displayFactionName').innerText = name;
+            
+            const box = document.getElementById('leaderDetailBox');
+            if (nick) {
+                box.innerHTML = `<div class="leader-avatar-icon"><i class="fa-solid fa-user-tie"></i></div>
+                    <div style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 700;">Лідер фракції</div>
+                    <div class="leader-nick-title">${nick}</div>
+                    <div class="leader-discord-tag"><i class="fa-brands fa-discord"></i> ${dc}</div>`;
+            } else {
+                box.innerHTML = `<div class="leader-avatar-icon" style="color: #666;"><i class="fa-solid fa-user-slash"></i></div>
+                    <div class="leader-nick-title" style="color: #e74c3c; font-size: 20px;">Фракція без лідера</div>
+                    <p style="font-size: 12px; color: #aaa; margin-top: 8px;">Наразі ця посада вакантна. Ви можете подати заявку на посаду лідера!</p>`;
+            }
+        }
+
+        function showHierarchyScreen() {
+            document.getElementById('factionListScreen').style.display = 'none';
+            document.getElementById('factionLeaderScreen').style.display = 'none';
+            document.getElementById('hierarchyScreen').style.display = 'block';
+        }
+
+        function backToFactionsList() {
+            document.getElementById('factionLeaderScreen').style.display = 'none';
+            document.getElementById('hierarchyScreen').style.display = 'none';
+            document.getElementById('factionListScreen').style.display = 'block';
+        }
+
+        // Захист сайту
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12') { e.preventDefault(); return false; }
+            if (e.ctrlKey) {
+                const key = e.key.toLowerCase();
+                if (['u', 'c', 's', 'a', 'p'].includes(key)) { e.preventDefault(); return false; }
+                if (e.shiftKey && ['i', 'j', 'c'].includes(key)) { e.preventDefault(); return false; }
+            }
+        });
+        document.addEventListener('selectstart', function(e) { e.preventDefault(); });
+    </script>
+</body>
+</html>
